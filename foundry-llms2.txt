@@ -1,0 +1,4555 @@
+# https://foundry-rs.github.io/starknet-foundry/ llms-full.txt
+
+# 404
+
+**There isn't a GitHub Pages site here.**
+
+If you're trying to publish one,
+[read the full documentation](https://help.github.com/pages/)
+to learn how to set up **GitHub Pages**
+for your repository, organization, or user account.
+
+
+[GitHub Status](https://githubstatus.com/) —
+[@githubstatus](https://twitter.com/githubstatus)
+
+[![](<Base64-Image-Removed>)](https://foundry-rs.github.io/)[![](<Base64-Image-Removed>)](https://foundry-rs.github.io/)- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/README.md "Suggest an edit")
+
+![logo](https://foundry-rs.github.io/starknet-foundry/images/logo.png)
+
+Starknet Foundry is a toolchain for developing Starknet smart contracts.
+It helps with writing, deploying, and testing your smart contracts.
+It is inspired by Foundry.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/snforge-advanced-features/fuzz-testing.md "Suggest an edit")
+
+In many cases, a test needs to verify function behavior for multiple possible values.
+While it is possible to come up with these cases on your own, it is often impractical, especially when you want to test
+against a large number of possible arguments.
+
+> ℹ️ **Info**
+> Currently, `snforge` fuzzer only supports using randomly generated values.
+> This way of fuzzing doesn't support any kind of value generation based on code analysis, test coverage or results of
+> other fuzzer runs.
+> In the future, more advanced fuzzing execution modes will be added.
+
+To convert a test to a random fuzz test, simply add arguments to the test function.
+These arguments can then be used in the test body.
+The test will be run many times against different randomly generated values.
+
+```rust hljs
+
+fn sum(a: felt252, b: felt252) -> felt252 {
+    return a + b;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::sum;
+
+    #[test]
+    fn test_sum(x: felt252, y: felt252) {
+        assert_eq!(sum(x, y), x + y);
+    }
+}
+```
+
+Then run `snforge test` like usual.
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 2 test(s) from fuzz_testing package
+Running 2 test(s) from src/
+[PASS] fuzz_testing::with_parameters::tests::test_sum (runs: 22, gas: {max: ~1, min: ~1, mean: ~1.00, std deviation: ~0.00})
+[PASS] fuzz_testing::basic_example::tests::test_sum (runs: 256, gas: {max: ~1, min: ~1, mean: ~1.00, std deviation: ~0.00})
+Tests: 2 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+Fuzzer seed: [..]
+
+```
+
+Fuzzer currently supports generating values of these types
+
+- `u8`
+- `u16`
+- `u32`
+- `u64`
+- `u128`
+- `u256`
+- `felt252`
+
+Trying to use arguments of different type in test definition will result in an error.
+
+It is possible to configure the number of runs of the random fuzzer as well as its seed for a specific test case:
+
+```rust hljs
+
+fn sum(a: felt252, b: felt252) -> felt252 {
+    return a + b;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::sum;
+
+    #[test]
+    #[fuzzer(runs: 22, seed: 38)]
+    fn test_sum(x: felt252, y: felt252) {
+        assert_eq!(sum(x, y), x + y);
+    }
+}
+```
+
+It can also be configured globally, via command line arguments:
+
+```shell hljs
+
+$ snforge test --fuzzer-runs 1234 --fuzzer-seed 1111
+
+```
+
+Or in `Scarb.toml` file:
+
+```toml hljs ini
+
+# ...
+[tool.snforge]
+fuzzer_runs = 1234
+fuzzer_seed = 1111
+# ...
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/paymaster_data.md "Suggest an edit")
+
+Cheatcodes modifying `paymaster_data`:
+
+> `fn cheat_paymaster_data(target: ContractAddress, paymaster_data: Span<felt252>, span: CheatSpan)`
+
+Changes the transaction paymaster data for the given target and span.
+
+> `fn start_cheat_paymaster_data_global(paymaster_data: Span<felt252>)`
+
+Changes the transaction paymaster data for all targets.
+
+> `fn start_cheat_paymaster_data(target: ContractAddress, paymaster_data: Span<felt252>)`
+
+Changes the transaction paymaster data for the given target.
+
+> `fn stop_cheat_paymaster_data(target: ContractAddress)`
+
+Cancels the `cheat_paymaster_data` / `start_cheat_paymaster_data` for the given target.
+
+> `fn stop_cheat_paymaster_data_global()`
+
+Cancels the `start_cheat_paymaster_data_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/load.md "Suggest an edit")
+
+> `fn load(target: ContractAddress, storage_address: felt252, size: felt252) -> Array<felt252> `
+
+Loads `size` felts from `target` contract's storage into an `Array`, starting at `storage_address`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library/get_call_trace.md "Suggest an edit")
+
+```rust hljs
+
+fn get_call_trace() -> CallTrace;
+```
+
+(For whole structure definition, please refer
+to [`snforge-std` source](https://github.com/foundry-rs/starknet-foundry/tree/v0.16.0/snforge_std))
+
+Gets current call trace of the test, up to the last call made to a contract.
+
+The whole structure is represented as a tree of calls, in which each contract interaction
+is a new execution scope - thus resulting in a new nested trace.
+
+> 📝 **Note**
+>
+> The topmost-call is representing the test call, which will always be present if you're running a test.
+
+The `CallTrace` structure implements a `Display` trait, for a pretty-print with indentations
+
+```rust hljs
+
+println!("{}", get_call_trace());
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/declare.md "Suggest an edit")
+
+Starknet provides a distinction between contract class and instance. This is similar to the difference between writing the code of a `class MyClass {}` and creating a new instance of it `let myInstance = MyClass()` in object-oriented programming languages.
+
+Declaring a contract is a necessary step to have your contract available on the network. Once a contract is declared, it then can be deployed and then interacted with.
+
+For a detailed CLI description, see [declare command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/declare.html).
+
+> 📝 **Note**
+> Building a contract before running `declare` is not required. Starknet Foundry `sncast` builds a contract during declaration under the hood using [Scarb](https://docs.swmansion.com/scarb).
+
+First make sure that you have created a `Scarb.toml` file for your contract (it should be present in project directory or one of its parent directories).
+
+Then run:
+
+```shell hljs
+
+$ sncast --account my_account \
+    declare \
+    --url http://127.0.0.1:5055 \
+    --contract-name HelloSncast
+
+```
+
+Output:
+
+```shell hljs
+
+command: declare
+class_hash: [..]
+transaction_hash: [..]
+
+To see declaration details, visit:
+class: https://starkscan.co/search/[..]
+transaction: https://starkscan.co/search/[..]
+
+```
+
+> 📝 **Note**
+> Contract name is a part after the `mod` keyword in your contract file. It may differ from package name defined in `Scarb.toml` file.
+
+> 📝 **Note**
+> In the above example we supply `sncast` with `--account` and `--url` flags. If `snfoundry.toml` is present, and has
+> the properties set, values provided using these flags will override values from `snfoundry.toml`. Learn more about `snfoundry.toml`
+> configuration [here](https://foundry-rs.github.io/starknet-foundry/projects/configuration.html#sncast).
+
+> 💡 **Info**
+> Max fee will be automatically computed if `--max-fee <MAX_FEE>` is not passed.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/invoke.md "Suggest an edit")
+
+Send an invoke transaction to Starknet.
+
+- [`account`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--account--a-account_name)
+
+Required.
+
+The address of the contract being called in hex (prefixed with '0x') or decimal representation.
+
+Required.
+
+The name of the function to call.
+
+Optional.
+
+Inputs to the function, represented by a list of space-delimited values `0x1 2 0x3`.
+Calldata arguments may be either 0x hex or decimal felts.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Maximum fee for the `invoke` transaction in Fri or Wei depending on fee token or transaction version. When not used, defaults to auto-estimation. Must be greater than zero.
+
+Optional. When not used, defaults to STRK.
+
+Token used for fee payment. Possible values: ETH, STRK.
+
+Optional.
+
+Maximum gas for the `invoke` transaction. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional.
+
+Maximum gas unit price for the `invoke` transaction paid in Fri. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional. When not used, defaults to v3.
+
+Version of the deployment transaction. Possible values: v1, v3.
+
+Optional.
+
+Nonce for transaction. If not provided, nonce will be set automatically.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library/declare.md "Suggest an edit")
+
+```rust hljs
+
+#[derive(Drop, Serde, Clone)]
+enum DeclareResult {
+    Success: ContractClass,
+    AlreadyDeclared: ContractClass,
+}
+
+trait DeclareResultTrait {
+    /// Gets inner `ContractClass`
+    /// `self` - an instance of the struct `DeclareResult` which is obtained by calling `declare`
+    // Returns the `@ContractClass`
+    fn contract_class(self: @DeclareResult) -> @ContractClass;
+}
+
+fn declare(contract: ByteArray) -> Result<DeclareResult, Array<felt252>>
+```
+
+Declares a contract for later deployment.
+
+Returns the `DeclareResult` that encapsulated possible outcomes in the enum:
+
+- `Success`: Contains the successfully declared `ContractClass`.
+- `AlreadyDeclared`: Contains `ContractClass` and signals that the contract has already been declared.
+
+See [docs of `ContractClass`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/contract_class.html) for more info about the resulting struct.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/verify.md "Suggest an edit")
+
+Starknet Foundry `sncast` supports verifying Cairo contract classes with the `sncast verify` command by submitting the source code to a selected verification provider. Verification provides transparency, making the code accessible to users and aiding debugging tools.
+
+The verification provider guarantees that the submitted source code aligns with the deployed contract class on the network by compiling the source code into Sierra bytecode and comparing it with the network-deployed Sierra bytecode.
+
+For detailed CLI description, see [verify command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/verify.html).
+
+> ⚠️ **Warning**
+> Please be aware that submitting the source code means it will be publicly exposed through the provider's APIs.
+
+Walnut is a tool for step-by-step debugging of Starknet transactions. You can learn more about Walnut here [walnut.dev](https://walnut.dev/). Note that Walnut requires you to specify the Starknet version in your `Scarb.toml` config file.
+
+First, ensure that you have created a `Scarb.toml` file for your contract (it should be present in the project directory or one of its parent directories). Make sure the contract has already been deployed on the network.
+
+Then run:
+
+```shell hljs
+
+$ sncast \
+    verify \
+    --contract-address 0x0589a8b8bf819b7820cb699ea1f6c409bc012c9b9160106ddc3dacd6a89653cf \
+    --contract-name HelloSncast \
+    --verifier walnut \
+    --network sepolia
+
+```
+
+Output:
+
+```shell hljs
+
+    You are about to submit the entire workspace code to the third-party verifier at walnut.
+
+    Important: Make sure your project does not include sensitive information like private keys. The snfoundry.toml file will be uploaded. Keep the keystore outside the project to prevent it from being uploaded.
+
+    Are you sure you want to proceed? (Y/n): Y
+
+command: verify
+message: Contract verification has started. You can check the verification status at the following link: https://api.walnut.dev/v1/verification/77f1d905-fdb4-4280-b7d6-57cd029d1259/status.
+
+```
+
+> 📝 **Note**
+> Contract name is a part after the `mod` keyword in your contract file. It may differ from package name defined in `Scarb.toml` file.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/account.md "Suggest an edit")
+
+Account is required to perform interactions with Starknet (only calls can be done without it). Starknet Foundry `sncast` supports
+entire account management flow with the `sncast account create` and `sncast account deploy` commands.
+
+Difference between those two commands is that the first one creates account information (private key, address and more)
+and the second one deploys it to the network. After deployment, account can be used to interact with Starknet.
+
+To remove an account from the accounts file, you can use `sncast account delete`. Please note this only removes the account information stored locally - this will not remove the account from Starknet.
+
+> 💡 **Info**
+> Accounts creation and deployment is supported for
+>
+> - OpenZeppelin
+> - Argent (with guardian set to 0)
+> - Braavos
+
+Do the following to start interacting with the Starknet:
+
+```shell hljs
+
+$ sncast \
+    account create \
+    --url http://127.0.0.1:5055 \
+    --name new_account
+
+```
+
+Output:
+
+```shell hljs
+
+command: account create
+add_profile: --add-profile flag was not set. No profile added to snfoundry.toml
+address: [..]
+max_fee: [..]
+message: Account successfully created. Prefund generated address with at least <max_fee> STRK tokens or an equivalent amount of ETH tokens. It is good to send more in the case of higher demand.
+
+To see account creation details, visit:
+account: https://sepolia.starkscan.co/contract/[..]
+
+```
+
+For a detailed CLI description, see [account create command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/create.html).
+
+See more advanced use cases below or jump directly to the section [here](https://foundry-rs.github.io/starknet-foundry/starknet/account.html#advanced-use-cases).
+
+To deploy an account in the next step, you need to prefund it with either STRK or an equivalent amount of ETH tokens (read more about them [here](https://docs.starknet.io/architecture-and-concepts/economics-of-starknet/)).
+You can do it both by sending tokens from another starknet account or by bridging them with [StarkGate](https://starkgate.starknet.io/).
+
+> 💡 **Info**
+> When deploying on a Sepolia test network, you can also fund your account with artificial tokens via the [Starknet Faucet](https://starknet-faucet.vercel.app/)![image](https://foundry-rs.github.io/starknet-foundry/starknet/images/starknet-faucet-sepolia.png)
+
+```shell hljs
+
+$ sncast \
+    account deploy \
+    --url http://127.0.0.1:5055 \
+    --name new_account \
+    --max-fee 9999999999999
+
+```
+
+Output:
+
+```shell hljs
+
+command: account deploy
+transaction_hash: [..]
+
+To see invocation details, visit:
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```
+
+For a detailed CLI description, see [account deploy command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/deploy.html).
+
+If you created an account with `sncast account create` it by default it will be saved in `~/.starknet_accounts/starknet_open_zeppelin_accounts.json` file which we call `default accounts file` in the following sections.
+
+### [`account import`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/import.html)
+
+To import an account to the `default accounts file`, use the `account import` command.
+
+```shell hljs
+
+$ sncast \
+    account import \
+    --url http://127.0.0.1:5055 \
+    --name my_imported_account \
+    --address 0x3a0bcb72428d8056cc7c2bbe5168ddfc844db2737dda3b4c67ff057691177e1 \
+    --private-key 0x2 \
+    --type oz
+
+```
+
+### [`account list`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/list.html)
+
+List all accounts saved in `accounts file`, grouped based on the networks they are defined on.
+
+```shell hljs
+
+$ sncast account list
+
+```
+
+Output:
+
+```shell hljs
+
+Available accounts (at [..]):
+- new_account:
+  network: alpha-sepolia
+  public key: [..]
+  address: [..]
+  salt: [..]
+  class hash: [..]
+  deployed: false
+  legacy: false
+  type: OpenZeppelin
+
+- my_account:
+  network: alpha-sepolia
+  public key: 0x48234b9bc6c1e749f4b908d310d8c53dae6564110b05ccf79016dca8ce7dfac
+  address: 0x6f4621e7ad43707b3f69f9df49425c3d94fdc5ab2e444bfa0e7e4edeff7992d
+  deployed: true
+  type: OpenZeppelin
+
+```
+
+You can specify a custom location for the accounts file with the `--accounts-file` or `-f` flag.
+There is also possibility to show private keys with the `--display-private-keys` or `-p` flag.
+
+### [`account delete`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/delete.html)
+
+Delete an account from `accounts-file` and its associated Scarb profile. If you pass this command, you will be asked to confirm the deletion.
+
+```shell hljs
+
+$ sncast account delete \
+    --name new_account \
+    --network alpha-sepolia
+
+```
+
+By default, `sncast` creates/deploys an account using [OpenZeppelin's account contract class hash](https://starkscan.co/class/0x00e2eb8f5672af4e6a4e8a8f1b44989685e668489b0a25437733756c5a34a1d6).
+It is possible to create an account using custom openzeppelin, argent or braavos contract declared to starknet. This can be achieved
+with `--class-hash` flag:
+
+```shell hljs
+
+$ sncast \
+    account create \
+    --name new_account_2 \
+    --url http://127.0.0.1:5055 \
+    --class-hash 0x00e2eb8f5672af4e6a4e8a8f1b44989685e668489b0a25437733756c5a34a1d6
+    --type oz
+
+```
+
+#### [`account create`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/create.html) With Salt Argument
+
+Instead of random generation, salt can be specified with `--salt`.
+
+```shell hljs
+
+$ sncast \
+    account create \
+    --url http://127.0.0.1:5055 \
+    --name another_account_3 \
+    --salt 0x1
+
+```
+
+##### [`--accounts-file`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/create.html\#create)
+
+Account information such as `private_key`, `class_hash`, `address` etc. will be saved to the file specified by `--accounts-file` argument,
+if not provided, the `default accounts file` will be used.
+
+##### [`--add-profile`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/create.html\#--add-profile-name)
+
+When the `--add-profile` flag is used, you won't need to include the `--url` or `--accounts-file` parameters
+(the latter being necessary if your account information was stored in a custom file).
+Simply use the `--profile` argument followed by the account name in subsequent requests.
+
+Accounts created and deployed with [starkli](https://book.starkli.rs/accounts#accounts) can be used by specifying the [`--keystore` argument](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--keystore--k-path_to_keystore_file).
+
+> 💡 **Info**
+> When passing the `--keystore` argument, `--account` argument must be a path to the starkli account JSON file.
+
+```shell hljs
+
+$ sncast \
+    --keystore keystore.json \
+    --account account.json  \
+    declare \
+    --url http://127.0.0.1:5055 \
+    --contract-name my_contract \
+
+```
+
+It is possible to create an openzeppelin account with keystore in a similar way [starkli](https://book.starkli.rs/accounts#accounts) does.
+
+```shell hljs
+
+$ sncast \
+    --keystore my_key.json \
+    --account my_account.json \
+    account create \
+    --url http://127.0.0.1:5050
+
+```
+
+The command above will generate a keystore file containing the private key, as well as an account file containing the openzeppelin account info that can later be used with starkli.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast-library/tx_status.md "Suggest an edit")
+
+> `pub fn tx_status(transaction_hash: felt252) -> Result<TxStatusResult, ScriptCommandError>`
+
+Gets the status of a transaction using its hash and returns `TxStatusResult`.
+
+- `transaction_hash` \- hash of the transaction
+
+```rust hljs
+
+use sncast_std::{tx_status};
+
+fn main() {
+    let transaction_hash = 0x00ae35dacba17cde62b8ceb12e3b18f4ab6e103fa2d5e3d9821cb9dc59d59a3c;
+    let status = tx_status(transaction_hash).expect('Failed to get status');
+
+    println!("transaction status: {:?}", status);
+}
+```
+
+Structures used by the command:
+
+```rust hljs
+
+#[derive(Drop, Clone, Debug, Serde, PartialEq)]
+pub enum FinalityStatus {
+    Received,
+    Rejected,
+    AcceptedOnL2,
+    AcceptedOnL1
+}
+
+#[derive(Drop, Copy, Debug, Serde, PartialEq)]
+pub enum ExecutionStatus {
+    Succeeded,
+    Reverted,
+}
+
+#[derive(Drop, Clone, Debug, Serde, PartialEq)]
+pub struct TxStatusResult {
+    pub finality_status: FinalityStatus,
+    pub execution_status: Option<ExecutionStatus>
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/resource_bounds.md "Suggest an edit")
+
+Cheatcodes modifying `resource_bounds`:
+
+> `fn cheat_resource_bounds(target: ContractAddress, resource_bounds: Span<ResourceBounds>, span: CheatSpan)`
+
+Changes the transaction resource bounds for the given target and span.
+
+> `fn start_cheat_resource_bounds_global(resource_bounds: Span<ResourceBounds>)`
+
+Changes the transaction resource bounds for all targets.
+
+> `fn start_cheat_resource_bounds(target: ContractAddress, resource_bounds: Span<ResourceBounds>)`
+
+Changes the transaction resource bounds for the given target.
+
+> `fn stop_cheat_resource_bounds(target: ContractAddress)`
+
+Cancels the `cheat_resource_bounds` / `start_cheat_resource_bounds` for the given target.
+
+> `fn stop_cheat_resource_bounds_global()`
+
+Cancels the `start_cheat_resource_bounds_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/account/account.md "Suggest an edit")
+
+Provides a set of account management commands.
+
+It has the following subcommands:
+
+- [`import`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/import.html)
+- [`create`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/create.html)
+- [`deploy`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/deploy.html)
+- [`delete`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/delete.html)
+- [`list`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/list.html)- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast-library/get_nonce.md "Suggest an edit")
+
+> `pub fn get_nonce(block_tag: felt252) -> felt252`
+
+Gets nonce of an account for a given block tag ( `pending` or `latest`) and returns nonce as `felt252`.
+
+- `block_tag` \- block tag name, one of `pending` or `latest`.
+
+```rust hljs
+
+use sncast_std::get_nonce;
+
+fn main() {
+    let nonce = get_nonce('latest');
+    println!("nonce: {}", nonce);
+    println!("debug nonce: {:?}", nonce);
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/account/delete.md "Suggest an edit")
+
+Delete an account from `accounts-file` and its associated snfoundry profile.
+
+Required.
+
+Account name which is going to be deleted.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Network in `accounts-file` associated with the account. By default, the network of RPC node.
+
+Optional.
+
+If passed, assume "yes" as answer to confirmation prompt and run non-interactively- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/max_fee.md "Suggest an edit")
+
+Cheatcodes modifying `max_fee`:
+
+> `fn cheat_max_fee(target: ContractAddress, max_fee: u128, span: CheatSpan)`
+
+Changes the transaction max fee for the given target and span.
+
+> `fn start_cheat_max_fee_global(max_fee: u128)`
+
+Changes the transaction max fee for all targets.
+
+> `fn start_cheat_max_fee(target: ContractAddress, max_fee: u128)`
+
+Changes the transaction max fee for the given target.
+
+> `fn stop_cheat_max_fee(target: ContractAddress)`
+
+Cancels the `cheat_max_fee` / `start_cheat_max_fee` for the given target.
+
+> `fn stop_cheat_max_fee_global()`
+
+Cancels the `start_cheat_max_fee_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/deploy.md "Suggest an edit")
+
+Deploy a contract to Starknet.
+
+- [`account`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--account--a-account_name)
+
+Required.
+
+Class hash of contract to deploy.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Calldata for the contract constructor.
+
+Optional.
+
+Salt for the contract address.
+
+Optional.
+
+If passed, the salt will be additionally modified with an account address.
+
+Optional.
+
+Maximum fee for the `deploy` transaction in Fri or Wei depending on fee token or transaction version. When not used, defaults to auto-estimation. Must be greater than zero.
+
+Optional. When not used, defaults to STRK.
+
+Token used for fee payment. Possible values: ETH, STRK.
+
+Optional.
+
+Maximum gas for the `deploy` transaction. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional.
+
+Maximum gas unit price for the `deploy` transaction paid in Fri. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional. When not used, defaults to v3.
+
+Version of the deployment transaction. Possible values: v1, v3.
+
+Optional.
+
+Nonce for transaction. If not provided, nonce will be set automatically.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/invoke.md "Suggest an edit")
+
+Starknet Foundry `sncast` supports invoking smart contracts on a given network with the `sncast invoke` command.
+
+In most cases, you have to provide:
+
+- Contract address
+- Function name
+- Function arguments
+
+For detailed CLI description, see [invoke command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/invoke.html).
+
+```shell hljs
+
+$ sncast \
+  --account my_account \
+  invoke \
+  --url http://127.0.0.1:5055 \
+  --contract-address 0x522dc7cbe288037382a02569af5a4169531053d284193623948eac8dd051716 \
+  --function "add" \
+  --arguments 'pokemons::model::PokemonData {'\
+'name: "Magmar",'\
+'element: pokemons::model::Element::Fire'\
+'}'
+
+```
+
+Output:
+
+```shell hljs
+
+command: invoke
+transaction_hash: [..]
+
+To see invocation details, visit:
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```
+
+> 💡 **Info**
+> Max fee will be automatically computed if `--max-fee <MAX_FEE>` is not passed.
+
+Not every function accepts parameters. Here is how to call it.
+
+```shell hljs
+
+$ sncast invoke \
+  --contract-address 0x0589a8b8bf819b7820cb699ea1f6c409bc012c9b9160106ddc3dacd6a89653cf \
+  --function "get_balance"
+
+```
+
+Output:
+
+```shell hljs
+
+command: invoke
+transaction_hash: [..]
+
+To see invocation details, visit:
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/script/run.md "Suggest an edit")
+
+Compile and run a cairo deployment script.
+
+- [`account`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--account--a-account_name)
+
+Required.
+
+Script module name that contains the 'main' function that will be executed.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Name of the package that should be used.
+
+If supplied, a script from this package will be used. Required if more than one package exists in a workspace.
+
+Optional.
+
+Do not read/write state from/to the state file.
+
+If set, a script will not read the state from the state file, and will not write a state to it.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/contracts-collection.md "Suggest an edit")
+
+`snforge` supports two mechanisms for collecting contracts used in tests.
+The default one depends on Scarb version used and can be controlled with `--no-optimization` flag.
+
+- If using Scarb version >= 2.8.3, [optimized collection mechanism](https://foundry-rs.github.io/starknet-foundry/testing/contract-collection/new-mechanism.html) is used by
+default.
+- If using Scarb version < 2.8.3 or running `snforge test` with `--no-optimization` flag,
+the [old collection mechanism](https://foundry-rs.github.io/starknet-foundry/testing/contract-collection/old-mechanism.html) is used.
+
+> 📝 **Note**
+>
+> Enabling new mechanism **requires** Scarb version >= 2.8.3.
+
+| Feature | Old Mechanism | Optimised Mechanism |
+| --- | --- | --- |
+| Using contracts from `/src` | ✅ | ✅ |
+| Using contracts from `/tests` | ❌ | ✅ |
+| Using contracts from modules marked with `#[cfg(test)]` | ❌ | ✅ |
+| Using contracts from dependencies | ✅ | ✅ |
+| Contracts more closely resemble ones from real network | ✅ | ❌ |
+| Less compilation steps required (faster compilation) | ❌ | ✅ |
+| Additional compilation step required ( `scarb build`) | ✅ | ❌ |- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/common.md "Suggest an edit")
+
+Optional.
+
+Used for both `snfoundry.toml` and `Scarb.toml` if specified.
+Defaults to `default` ( `snfoundry.toml`) and `dev` ( `Scarb.toml`).
+
+Optional.
+
+Account name used to interact with the network, aliased in open zeppelin accounts file.
+
+Overrides account from `snfoundry.toml`.
+
+If used with `--keystore`, should be a path to [starkli account JSON file](https://book.starkli.rs/accounts#accounts).
+
+Optional.
+
+Path to the open zeppelin accounts file holding accounts info. Defaults to `~/.starknet_accounts/starknet_open_zeppelin_accounts.json`.
+
+Optional.
+
+Path to [keystore file](https://book.starkli.rs/signers#encrypted-keystores).
+When specified, the --account argument must be a path to [starkli account JSON file](https://book.starkli.rs/accounts#accounts).
+
+Optional.
+
+If passed, values will be displayed in decimal format. Default is addresses as hex and fees as int.
+
+Optional.
+
+If passed, values will be displayed in hex format. Default is addresses as hex and fees as int.
+
+Optional.
+
+If passed, output will be displayed in json format.
+
+Optional.
+
+If passed, command will wait until transaction is accepted or rejected.
+
+Optional.
+
+If `--wait` is passed, this will set the time after which `sncast` times out. Defaults to 60s.
+
+Optional.
+
+If `--wait` is passed, this will set the retry interval - how often `sncast` should fetch tx info from the node. Defaults to 5s.
+
+Prints out `sncast` version.
+
+Prints out help.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/fees-and-versions.md "Suggest an edit")
+
+Historically, fees for transactions on Starknet had to be paid exclusively with ETH. However, with the rollout of v3
+transactions, users now have the additional option to pay these fees using **STRK**, and it is _**the default token used by sncast to pay fees**_.
+
+> 💡 **Info**
+> V3 transactions have additional options, that give you more control over transaction fee. You can specify the maximum gas unit price and the maximum gas for the transaction.
+> This is done using the `--max-gas` and `--max-gas-unit-price` flags.
+
+Cast allows you to specify either the version of the transaction you want to send or the fee token you want to pay the fees in. This is done using
+the `--version` and `--fee-token` flags.
+
+> ⚠️ **Warning** `--fee-token` flag is deprecated and will be removed in the future due to [SNIP-16: Deprecation of Transaction Versions 0,1,2](https://community.starknet.io/t/snip-16-deprecation-of-transaction-versions-0-1-2/114443).
+> It is recommended to use `--version` flag instead or let the version be inferred automatically.
+
+> 💡 **Info**
+> Don't worry if you're not sure which version to use, it will be inferred automatically based on the fee token you
+> provide. The same goes for the fee token, if you provide a version, the fee token will be inferred.
+
+When deploying an account, you can specify the version of the transaction and the fee token to use. The table below shows which token is used for which version of the transaction:
+
+| Version | Fee Token |
+| --- | --- |
+| v1 | eth |
+| v3 | strk |
+
+When paying in ETH, you need to either set `--fee-token` to `eth`:
+
+```shell hljs
+
+$ sncast account deploy \
+    --name example-name \
+    --fee-token eth \
+    --max-fee 9999999999999
+
+```
+
+or set `--version` to `v1`:
+
+```shell hljs
+
+$ sncast account deploy \
+    --name example-name \
+    --version v1 \
+    --max-fee 9999999999999
+
+```
+
+In case of paying in STRK, you don't need to specify the `--fee-token` or `--version` flags, but the same rules apply.
+
+> 📝 **Note**
+> The unit used in `--max-fee` flag is the smallest unit of the given fee token. For ETH it is WEI, for STRK it is FRI.
+
+Currently, there are two versions of the deployment transaction: v1 and v3. The table below shows which token is used for which version of the transaction:
+
+| Version | Fee Token |
+| --- | --- |
+| v1 | eth |
+| v3 | strk |
+
+Currently, there are two versions of the declare transaction: v2 and v3. The table below shows which token is used for which version of the transaction:
+
+| Version | Fee Token |
+| --- | --- |
+| v2 | eth |
+| v3 | strk |
+
+Currently, there are two versions of invoke transaction: v1 and v3. The table below shows which token is used for which version of the transaction:
+
+| Version | Fee Token |
+| --- | --- |
+| v1 | eth |
+| v3 | strk |- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/block_timestamp.md "Suggest an edit")
+
+Cheatcodes modifying `block_timestamp`:
+
+> `fn cheat_block_timestamp(target: ContractAddress, block_timestamp: u64, span: CheatSpan)`
+
+Changes the block timestamp for the given target and span.
+
+> `fn start_cheat_block_timestamp_global(block_timestamp: u64)`
+
+Changes the block timestamp for all targets.
+
+> `fn start_cheat_block_timestamp(target: ContractAddress, block_timestamp: u64)`
+
+Changes the block timestamp for the given target.
+
+> `fn stop_cheat_block_timestamp(target: ContractAddress)`
+
+Cancels the `cheat_block_timestamp` / `start_cheat_block_timestamp` for the given target.
+
+> `fn stop_cheat_block_timestamp_global()`
+
+Cancels the `start_cheat_block_timestamp_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/nonce.md "Suggest an edit")
+
+Cheatcodes modifying `nonce`:
+
+> `fn cheat_nonce(target: ContractAddress, nonce: felt252, span: CheatSpan)`
+
+Changes the transaction nonce for the given target and span.
+
+> `fn start_cheat_nonce_global(nonce: felt252)`
+
+Changes the transaction nonce for all targets.
+
+> `fn start_cheat_nonce(target: ContractAddress, nonce: felt252)`
+
+Changes the transaction nonce for the given target.
+
+> `fn stop_cheat_nonce(target: ContractAddress)`
+
+Cancels the `cheat_nonce` / `start_cheat_nonce` for the given target.
+
+> `fn stop_cheat_nonce_global()`
+
+Cancels the `start_cheat_nonce_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast-library/call.md "Suggest an edit")
+
+> `pub fn call( contract_address: ContractAddress, function_selector: felt252, calldata: Array::<felt252> ) -> Result<CallResult, ScriptCommandError>`
+
+Calls a contract and returns `CallResult`.
+
+- `contract_address` \- address of the contract to call.
+- `function_selector` \- the selector of the function to call.
+- `calldata` \- inputs to the function to be called.
+
+```rust hljs
+
+use sncast_std::{call, CallResult};
+use starknet::ContractAddress;
+
+fn main() {
+    let contract_address: ContractAddress =
+        0x1e52f6ebc3e594d2a6dc2a0d7d193cb50144cfdfb7fdd9519135c29b67e427
+        .try_into()
+        .expect('Invalid contract address value');
+
+    let result = call(contract_address, selector!("get"), array![0x1]).expect('call failed');
+
+    println!("call result: {}", result);
+    println!("debug call result: {:?}", result);
+}
+```
+
+Structure used by the command:
+
+```rust hljs
+
+#[derive(Drop, Clone, Debug)]
+pub struct CallResult {
+    pub data: Array::<felt252>,
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge/clean-cache.md "Suggest an edit")
+
+Clean `snforge` cache directory.
+
+Print help.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/getting-started/first-steps.md "Suggest an edit")
+
+In this section we provide an overview of Starknet Foundry `snforge` command line tool.
+We demonstrate how to create a new project, compile, and test it.
+
+To start a new project with Starknet Foundry, run `snforge new`
+
+```shell hljs
+
+$ snforge new hello_starknet
+
+```
+
+Let's check out the project structure
+
+```shell hljs
+
+$ cd hello_starknet
+$ tree . -L 1
+
+```
+
+Output:
+
+```shell hljs
+
+.
+├── Scarb.lock
+├── Scarb.toml
+├── snfoundry.toml
+├── src
+└── tests
+
+2 directories, 3 files
+
+```
+
+- `src/` contains source code of all your contracts.
+- `tests/` contains tests.
+- `Scarb.toml` contains configuration of the project as well as of `snforge`
+- `Scarb.lock` a locking mechanism to achieve reproducible dependencies when installing the project locally
+
+And run tests with `snforge test`
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 2 test(s) from hello_starknet package
+Running 0 test(s) from src/
+Running 2 test(s) from tests/
+[PASS] hello_starknet_integrationtest::test_contract::test_cannot_increase_balance_with_zero_value (gas: ~105)
+[PASS] hello_starknet_integrationtest::test_contract::test_increase_balance (gas: ~172)
+Tests: 2 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+To use `snforge` with existing Scarb projects, make sure you have declared the `snforge_std` package as your project
+development dependency.
+
+Add the following line under `[dev-dependencies]` section in the `Scarb.toml` file.
+
+```toml hljs ini
+
+# ...
+
+[dev-dependencies]
+snforge_std = "0.33.0"
+
+```
+
+Make sure that the above version matches the installed `snforge` version. You can check the currently installed version with
+
+```shell hljs
+
+$ snforge --version
+
+```
+
+Output:
+
+```shell hljs
+
+snforge 0.33.0
+
+```
+
+It is also possible to add this dependency
+using [`scarb add`](https://docs.swmansion.com/scarb/docs/guides/dependencies.html#adding-a-dependency-via-scarb-add)
+command.
+
+```shell hljs
+
+$ scarb add snforge_std@0.33.0 --dev
+
+```
+
+Additionally, ensure that starknet-contract target is enabled in the `Scarb.toml` file.
+
+```toml hljs ini
+
+# ...
+[[target.starknet-contract]]
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/caller_address.md "Suggest an edit")
+
+Cheatcodes modifying `caller_address`:
+
+> `fn cheat_caller_address(target: ContractAddress, caller_address: ContractAddress, span: CheatSpan)`
+
+Changes the caller address for the given target and span.
+
+> `fn start_cheat_caller_address_global(caller_address: ContractAddress)`
+
+Changes the caller address for all targets.
+
+> `fn start_cheat_caller_address(target: ContractAddress, caller_address: ContractAddress)`
+
+Changes the caller address for the given target.
+
+> `fn stop_cheat_caller_address(target: ContractAddress)`
+
+Cancels the `cheat_caller_address` / `start_cheat_caller_address` for the given target.
+
+> `fn stop_cheat_caller_address_global()`
+
+Cancels the `start_cheat_caller_address_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/spy_messages_to_l1.md "Suggest an edit")
+
+> `fn spy_messages_to_l1() -> MessageToL1Spy`
+
+Creates `MessageToL1Spy` instance that spies on all messages sent to L1 after its creation.
+
+```rust hljs
+
+struct MessageToL1Spy {
+    // ..
+}
+```
+
+Message spy structure allowing to get messages emitted only after its creation.
+
+```rust hljs
+
+struct MessagesToL1 {
+    messages: Array<(ContractAddress, MessageToL1)>
+}
+```
+
+A wrapper structure on an array of messages to handle filtering smoothly.
+`messages` is an array of `(l2_sender_address, message)` tuples.
+
+```rust hljs
+
+struct MessageToL1 {
+    /// An ethereum address where the message is destined to go
+    to_address: EthAddress,
+    /// Actual payload which will be delivered to L1 contract
+    payload: Array<felt252>
+}
+
+```
+
+Raw message to L1 format (as seen via the RPC-API), can be used for asserting the sent messages.
+
+```rust hljs
+
+trait MessageToL1SpyTrait {
+    /// Gets all messages given [`MessageToL1Spy`] spies for.
+    fn get_messages(ref self: MessageToL1Spy) -> MessagesToL1;
+}
+```
+
+Gets all messages since the creation of the given `MessageToL1Spy`.
+
+```rust hljs
+
+trait MessageToL1SpyAssertionsTrait {
+    fn assert_sent(ref self: MessageToL1Spy, messages: @Array<(ContractAddress, MessageToL1)>);
+    fn assert_not_sent(ref self: MessageToL1Spy, messages: @Array<(ContractAddress, MessageToL1)>);
+}
+```
+
+Allows to assert the expected sent messages (or lack thereof), in the scope of `MessageToL1Spy` structure.
+
+```rust hljs
+
+trait MessageToL1FilterTrait {
+    /// Filter messages emitted by a sender of a given [`ContractAddress`]
+    fn sent_by(self: @MessagesToL1, contract_address: ContractAddress) -> MessagesToL1;
+    /// Filter messages emitted by a receiver of a given ethereum address
+    fn sent_to(self: @MessagesToL1, to_address: EthAddress) -> MessagesToL1;
+}
+```
+
+Filters messages emitted by a given `ContractAddress`, or sent to given `EthAddress`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/contracts.md "Suggest an edit")
+
+> ℹ️ **Info**
+>
+> To use the library functions designed for testing smart contracts,
+> you need to add `snforge_std` package as a dependency in
+> your [`Scarb.toml`](https://docs.swmansion.com/scarb/docs/guides/dependencies.html#development-dependencies)
+> using the appropriate version.
+>
+> ```toml hljs ini
+>
+> [dev-dependencies]
+> snforge_std = "0.33.0"
+>
+> ```
+
+Using unit testing as much as possible is a good practice, as it makes your test suites run faster. However, when
+writing smart contracts, you often want to test their interactions with the blockchain state and with other contracts.
+
+Let's consider a simple smart contract with two methods.
+
+```rust hljs
+
+#[starknet::interface]
+pub trait ISimpleContract<TContractState> {
+    fn increase_balance(ref self: TContractState, amount: felt252);
+    fn get_balance(self: @TContractState) -> felt252;
+}
+
+#[starknet::contract]
+pub mod SimpleContract {
+    #[storage]
+    struct Storage {
+        balance: felt252,
+    }
+
+    #[abi(embed_v0)]
+    pub impl SimpleContractImpl of super::ISimpleContract<ContractState> {
+        // Increases the balance by the given amount
+        fn increase_balance(ref self: ContractState, amount: felt252) {
+            self.balance.write(self.balance.read() + amount);
+        }
+
+        // Gets the balance.
+        fn get_balance(self: @ContractState) -> felt252 {
+            self.balance.read()
+        }
+    }
+}
+```
+
+Note that the name after `mod` will be used as the contract name for testing purposes.
+
+Let's write a test that will deploy the `SimpleContract` contract and call some functions.
+
+```rust hljs
+
+use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
+
+use testing_smart_contracts_writing_tests::{
+    ISimpleContractDispatcher, ISimpleContractDispatcherTrait
+};
+
+#[test]
+fn call_and_invoke() {
+    // First declare and deploy a contract
+    let contract = declare("SimpleContract").unwrap().contract_class();
+    // Alternatively we could use `deploy_syscall` here
+    let (contract_address, _) = contract.deploy(@array![]).unwrap();
+
+    // Create a Dispatcher object that will allow interacting with the deployed contract
+    let dispatcher = ISimpleContractDispatcher { contract_address };
+
+    // Call a view function of the contract
+    let balance = dispatcher.get_balance();
+    assert(balance == 0, 'balance == 0');
+
+    // Call a function of the contract
+    // Here we mutate the state of the storage
+    dispatcher.increase_balance(100);
+
+    // Check that transaction took effect
+    let balance = dispatcher.get_balance();
+    assert(balance == 100, 'balance == 100');
+}
+```
+
+> 📝 **Note**
+>
+> Notice that the arguments to the contract's constructor (the `deploy`'s `calldata` argument) need to be serialized with `Serde`.
+>
+> `SimpleContract` contract has no constructor, so the calldata remains empty in the example above.
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 2 test(s) from testing_smart_contracts_handling_errors package
+Running 2 test(s) from tests/
+[FAIL] testing_smart_contracts_handling_errors_integrationtest::panic::failing
+
+Failure data:
+    (0x50414e4943 ('PANIC'), 0x444159544148 ('DAYTAH'))
+
+[PASS] testing_smart_contracts_handling_errors_integrationtest::handle_panic::handling_string_errors (gas: ~103)
+Running 0 test(s) from src/
+Tests: 1 passed, 1 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Failures:
+    testing_smart_contracts_handling_errors_integrationtest::panic::failing
+
+```
+
+Sometimes we want to test contracts functions that can panic, like testing that function that verifies caller address
+panics on invalid address. For that purpose Starknet also provides a `SafeDispatcher`, that returns a `Result` instead of
+panicking.
+
+First, let's add a new, panicking function to our contract.
+
+```rust hljs
+
+#[starknet::interface]
+pub trait IPanicContract<TContractState> {
+    fn do_a_panic(self: @TContractState);
+    fn do_a_string_panic(self: @TContractState);
+}
+
+#[starknet::contract]
+pub mod PanicContract {
+    use core::array::ArrayTrait;
+
+    #[storage]
+    struct Storage {}
+
+    #[abi(embed_v0)]
+    pub impl PanicContractImpl of super::IPanicContract<ContractState> {
+        // Panics
+        fn do_a_panic(self: @ContractState) {
+            panic(array!['PANIC', 'DAYTAH']);
+        }
+
+        fn do_a_string_panic(self: @ContractState) {
+            // A macro which allows panicking with a ByteArray (string) instance
+            panic!("This is panicking with a string, which can be longer than 31 characters");
+        }
+    }
+}
+```
+
+If we called this function in a test, it would result in a failure.
+
+```rust hljs
+
+use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
+
+use testing_smart_contracts_handling_errors::{
+    IPanicContractDispatcher, IPanicContractDispatcherTrait
+};
+
+#[test]
+fn failing() {
+    let contract = declare("PanicContract").unwrap().contract_class();
+    let (contract_address, _) = contract.deploy(@array![]).unwrap();
+    let dispatcher = IPanicContractDispatcher { contract_address };
+
+    dispatcher.do_a_panic();
+}
+```
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 2 test(s) from testing_smart_contracts_handling_errors package
+Running 2 test(s) from tests/
+[FAIL] testing_smart_contracts_handling_errors_integrationtest::panic::failing
+
+Failure data:
+    (0x50414e4943 ('PANIC'), 0x444159544148 ('DAYTAH'))
+
+[PASS] testing_smart_contracts_handling_errors_integrationtest::handle_panic::handling_string_errors (gas: ~103)
+Running 0 test(s) from src/
+Tests: 1 passed, 1 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Failures:
+    testing_smart_contracts_handling_errors_integrationtest::panic::failing
+
+```
+
+Using `SafeDispatcher` we can test that the function in fact panics with an expected message.
+Safe dispatcher is a special kind of dispatcher, which are not allowed in contracts themselves,
+but are available for testing purposes.
+
+They allow using the contract without automatically unwrapping the result, which allows to catch the error like shown below.
+
+```rust hljs
+
+use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
+
+use testing_smart_contracts_safe_dispatcher::{
+    IPanicContractSafeDispatcher, IPanicContractSafeDispatcherTrait
+};
+
+#[test]
+#[feature("safe_dispatcher")]
+fn handling_errors() {
+    let contract = declare("PanicContract").unwrap().contract_class();
+    let (contract_address, _) = contract.deploy(@array![]).unwrap();
+    let safe_dispatcher = IPanicContractSafeDispatcher { contract_address };
+
+    match safe_dispatcher.do_a_panic() {
+        Result::Ok(_) => panic!("Entrypoint did not panic"),
+        Result::Err(panic_data) => {
+            assert(*panic_data.at(0) == 'PANIC', *panic_data.at(0));
+            assert(*panic_data.at(1) == 'DAYTAH', *panic_data.at(1));
+        }
+    };
+}
+```
+
+Now the test passes as expected.
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 1 test(s) from testing_smart_contracts_safe_dispatcher package
+Running 0 test(s) from src/
+Running 1 test(s) from tests/
+[PASS] testing_smart_contracts_safe_dispatcher_integrationtest::safe_dispatcher::handling_errors (gas: ~103)
+Tests: 1 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+Similarly, you can handle the panics which use `ByteArray` as an argument (like an `assert!` or `panic!` macro)
+
+```rust hljs
+
+// Necessary utility function import
+use snforge_std::byte_array::try_deserialize_bytearray_error;
+use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
+
+use testing_smart_contracts_handling_errors::{
+    IPanicContractSafeDispatcher, IPanicContractSafeDispatcherTrait
+};
+
+#[test]
+#[feature("safe_dispatcher")]
+fn handling_string_errors() {
+    let contract = declare("PanicContract").unwrap().contract_class();
+    let (contract_address, _) = contract.deploy(@array![]).unwrap();
+    let safe_dispatcher = IPanicContractSafeDispatcher { contract_address };
+
+    match safe_dispatcher.do_a_string_panic() {
+        Result::Ok(_) => panic!("Entrypoint did not panic"),
+        Result::Err(panic_data) => {
+            let str_err = try_deserialize_bytearray_error(panic_data.span()).expect('wrong format');
+
+            assert(
+                str_err == "This is panicking with a string, which can be longer than 31 characters",
+                'wrong string received'
+            );
+        }
+    };
+}
+```
+
+You also could skip the de-serialization of the `panic_data`, and not use `try_deserialize_bytearray_error`, but this way you can actually use assertions on the `ByteArray` that was used to panic.
+
+> 📝 **Note**
+>
+> To operate with `SafeDispatcher` it's required to annotate its usage with `#[feature("safe_dispatcher")]`.
+>
+> There are 3 options:
+>
+> - module-level declaration
+>
+>
+>   ```rust hljs
+>
+>   #[feature("safe_dispatcher")]
+>   mod my_module;
+>   ```
+>
+> - function-level declaration
+>
+>
+>   ```rust hljs
+>
+>   #[feature("safe_dispatcher")]
+>   fn my_function() { ... }
+>   ```
+>
+> - directly before the usage
+>
+>
+>   ```rust hljs
+>
+>   #[feature("safe_dispatcher")]
+>   let result = safe_dispatcher.some_function();
+>   ```
+
+Sometimes the test code failing can be a desired behavior.
+Instead of manually handling it, you can simply mark your test as `#[should_panic(...)]`.
+[See here](https://foundry-rs.github.io/starknet-foundry/testing/testing.html#expected-failures) for more details.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/tip.md "Suggest an edit")
+
+Cheatcodes modifying `tip`:
+
+> `fn cheat_tip(target: ContractAddress, tip: u128, span: CheatSpan)`
+
+Changes the transaction tip for the given target and span.
+
+> `fn start_cheat_tip_global(tip: u128)`
+
+Changes the transaction tip for all targets.
+
+> `fn start_cheat_tip(target: ContractAddress, tip: u128)`
+
+Changes the transaction tip for the given target.
+
+> `fn stop_cheat_tip(target: ContractAddress)`
+
+Cancels the `cheat_tip` / `start_cheat_tip` for the given target.
+
+> `fn stop_cheat_tip_global()`
+
+Cancels the `start_cheat_tip_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge/init.md "Suggest an edit")
+
+Create a new directory with a `snforge` project.
+
+Name of a new project.
+
+Print help.
+
+> ⚠️ **Warning**
+>
+> The `snforge init` command is deprecated. Please use the [`snforge new`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge/new.html) command instead.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/test-collection.md "Suggest an edit")
+
+Snforge executes tests, but it does not compile them directly.
+Instead, it compiles tests by internally running `scarb build --test` command.
+
+The `snforge_scarb_plugin` dependency, which is included with `snforge_std` dependency makes all functions
+marked with `#[test]` executable and indicates to Scarb they should be compiled.
+Without the plugin, no snforge tests can be compiled, that's why `snforge_std` dependency is always required in all
+snforge projects.
+
+Thanks to that, Scarb collects all functions marked with `#[test]`
+from [valid locations](https://docs.swmansion.com/scarb/docs/extensions/testing.html#tests-organization) and compiles
+them into tests that are executed by snforge.
+
+Under the hood, Scarb utilizes the `[[test]]` target mechanism to compile the tests. More information about the
+`[[test]]` target is available in
+the [Scarb documentation](https://docs.swmansion.com/scarb/docs/reference/targets.html#test-targets).
+
+By default, `[[test]]]` target is implicitly configured and user does not have to define it.
+See [Scarb documentation](https://docs.swmansion.com/scarb/docs/reference/targets.html#auto-detection-of-test-targets)
+for more details about the mechanism.
+
+Test can be placed in both `src` and `test` directories. When adding tests to files in `src` you must wrap them in tests
+module.
+
+You can read more about tests organization
+in [Scarb documentation](https://docs.swmansion.com/scarb/docs/extensions/testing.html#tests-organization).
+
+Test placed in `src` directory are often called unit tests.
+For these test to function in snforge, they must be wrapped in a module marked with `#[cfg(test)]` attribute.
+
+```rust hljs
+
+// src/example.rs
+// ...
+
+// This test is not in module marked with `#[cfg(test)]` so it won't work
+#[test]
+fn my_invalid_test() {
+    // ...
+}
+
+#[cfg(test)]
+mod tests {
+    // This test is in module marked with `#[cfg(test)]` so it will work
+    #[test]
+    fn my_test() {
+        // ..
+    }
+}
+```
+
+Integration tests are placed in `tests` directory.
+This directory is a special directory in Scarb.
+Tests do not have to be wrapped in `#[cfg(test)]` and each file is treated as a separate module.
+
+```rust hljs
+
+// tests/example.rs
+// ...
+
+// This test is in `tests` directory
+// so it works without being in module with `#[cfg(test)]`
+#[test]
+fn my_test_1() {
+    // ..
+}
+```
+
+As written above, each file in `tests` directory is treated as a separate module
+
+```shell hljs
+
+$ tree
+
+```
+
+Output:
+
+```shell hljs
+
+tests/
+├── module1.cairo <-- is collected
+├── module2.cairo <-- is collected
+└── module3.cairo <-- is collected
+
+```
+
+Scarb will collect each file and compile it as a
+separate [test target](https://docs.swmansion.com/scarb/docs/reference/targets.html#test-targets).
+Each of these targets will be run separately by `snforge`.
+
+However, it is also possible to define `lib.cairo` file in `tests`.
+This stops files in `tests` from being treated as separate modules.
+Instead, Scarb will only create a single test target for that `lib.cairo` file.
+Only tests that are reachable from this file will be collected and compiled.
+
+```shell hljs
+
+$ tree
+
+```
+
+Output:
+
+```shell hljs
+
+tests/
+├── lib.cairo
+├── module1.cairo  <-- is collected
+├── module2.cairo  <-- is collected
+└── module3.cairo  <-- is not collected
+
+```
+
+```rust hljs
+
+// tests/lib.cairo
+
+mod module1;
+mod module2;
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/show_config.md "Suggest an edit")
+
+Prints the config currently being used
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/deploy.md "Suggest an edit")
+
+Starknet Foundry `sncast` supports deploying smart contracts to a given network with the `sncast deploy` command.
+
+It works by invoking a [Universal Deployer Contract](https://docs.openzeppelin.com/contracts-cairo/0.19.0/udc), which deploys the contract with the given class hash and constructor arguments.
+
+For detailed CLI description, see [deploy command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/deploy.html).
+
+After [declaring your contract](https://foundry-rs.github.io/starknet-foundry/starknet/declare.html), you can deploy it the following way:
+
+```shell hljs
+
+$ sncast \
+    --account my_account \
+    deploy \
+    --url http://127.0.0.1:5055/rpc \
+    --class-hash 0x0227f52a4d2138816edf8231980d5f9e6e0c8a3deab45b601a1fcee3d4427b02
+
+```
+
+Output:
+
+```shell hljs
+
+command: deploy
+contract_address: [..]
+transaction_hash: [..]
+
+To see deployment details, visit:
+contract: https://sepolia.starkscan.co/contract/[..]
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```
+
+> 💡 **Info**
+> Max fee will be automatically computed if `--max-fee <MAX_FEE>` is not passed.
+
+For such a constructor in the declared contract
+
+```rust hljs
+
+#[constructor]
+fn constructor(ref self: ContractState, first: felt252, second: u256) {
+    ...
+}
+```
+
+you have to pass constructor calldata to deploy it.
+
+```shell hljs
+
+$ sncast deploy \
+    --class-hash 0x02e93ad9922ac92f3eed232be8ca2601fe19f843b7af8233a2e722c9975bc4ea \
+    --constructor-calldata 0x1 0x2 0x3
+
+```
+
+Output:
+
+```shell hljs
+
+command: deploy
+contract_address: [..]
+transaction_hash: [..]
+
+To see deployment details, visit:
+contract: https://sepolia.starkscan.co/contract/[..]
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```
+
+> 📝 **Note**
+> Although the constructor has only two params you have to pass more because u256 is serialized to two felts.
+> It is important to know how types are serialized because all values passed as constructor calldata are
+> interpreted as a field elements (felt252).
+
+Salt is a parameter which modifies contract's address, if not passed it will be automatically generated.
+
+```shell hljs
+
+$ sncast deploy \
+    --class-hash 0x0227f52a4d2138816edf8231980d5f9e6e0c8a3deab45b601a1fcee3d4427b02 \
+    --salt 0x123
+
+```
+
+Output:
+
+```shell hljs
+
+command: deploy
+contract_address: [..]
+transaction_hash: [..]
+
+To see deployment details, visit:
+contract: https://sepolia.starkscan.co/contract/[..]
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```
+
+Unique is a parameter which modifies contract's salt with the deployer address.
+It can be passed even if the `salt` argument was not provided.
+
+```shell hljs
+
+$ sncast deploy \
+    --class-hash 0x0227f52a4d2138816edf8231980d5f9e6e0c8a3deab45b601a1fcee3d4427b02 \
+    --unique
+
+```
+
+Output:
+
+```shell hljs
+
+command: deploy
+contract_address: [..]
+transaction_hash: [..]
+
+Details:
+contract: https://sepolia.starkscan.co/contract/[..]
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/block_number.md "Suggest an edit")
+
+Cheatcodes modifying `block_number`:
+
+> `fn cheat_block_number(target: ContractAddress, block_number: u64, span: CheatSpan)`
+
+Changes the block number for the given target and span.
+
+> `fn start_cheat_block_number_global(block_number: u64)`
+
+Changes the block number for all targets.
+
+> `fn start_cheat_block_number(target: ContractAddress, block_number: u64)`
+
+Changes the block number for the given target.
+
+> `fn stop_cheat_block_number(target: ContractAddress)`
+
+Cancels the `cheat_block_number` / `start_cheat_block_number` for the given target.
+
+> `fn stop_cheat_block_number_global()`
+
+Cancels the `start_cheat_block_number_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/replace_bytecode.md "Suggest an edit")
+
+> `fn replace_bytecode(contract: ContractAddress, new_class: ClassHash) -> Result<(), ReplaceBytecodeError>`
+
+Replaces class for given contract address.
+The `new_class` hash has to be declared in order for the replacement class to execute the code when interacting with the contract.
+Returns `Result::Ok` if the replacement succeeded, and a `ReplaceBytecodeError` with appropriate error type otherwise
+
+An enum with appropriate type of replacement failure
+
+```rust hljs
+
+pub enum ReplaceBytecodeError {
+    /// Means that the contract does not exist, and thus bytecode cannot be replaced
+    ContractNotDeployed,
+    /// Means that the given class for replacement is not declared
+    UndeclaredClassHash,
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/call.md "Suggest an edit")
+
+Call a smart contract on Starknet with the given parameters.
+
+Required.
+
+The address of the contract being called in hex (prefixed with '0x') or decimal representation.
+
+Required.
+
+The name of the function being called.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Inputs to the function, represented by a list of space-delimited values, e.g. `0x1 2 0x3`.
+Calldata arguments may be either 0x hex or decimal felts.
+
+Optional.
+
+Block identifier on which call should be performed.
+Possible values: `pending`, `latest`, block hash (0x prefixed string), and block number (u64).
+`pending` is used as a default value.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/fee_data_availability_mode.md "Suggest an edit")
+
+Cheatcodes modifying `fee_data_availability_mode`:
+
+> `fn cheat_fee_data_availability_mode(target: ContractAddress, fee_data_availability_mode: u32, span: CheatSpan)`
+
+Changes the transaction fee data availability mode for the given target and span.
+
+> `fn start_cheat_fee_data_availability_mode_global(fee_data_availability_mode: u32)`
+
+Changes the transaction fee data availability mode for all targets.
+
+> `fn start_cheat_fee_data_availability_mode(target: ContractAddress, fee_data_availability_mode: u32)`
+
+Changes the transaction fee data availability mode for the given target.
+
+> `fn stop_cheat_fee_data_availability_mode(target: ContractAddress)`
+
+Cancels the `cheat_fee_data_availability_mode` / `start_cheat_fee_data_availability_mode` for the given target.
+
+> `fn stop_cheat_fee_data_availability_mode_global()`
+
+Cancels the `start_cheat_fee_data_availability_mode_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/script/init.md "Suggest an edit")
+
+Create a deployment script template.
+
+The command creates the following file and directory structure:
+
+```hljs
+
+.
+└── scripts
+    └── my_script
+        ├── Scarb.toml
+        └── src
+            ├── lib.cairo
+            └── my_script.cairo
+
+```
+
+Required.
+
+Name of a script to create.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/mock_call.md "Suggest an edit")
+
+Cheatcodes mocking contract entry point calls:
+
+> `fn mock_call<T, impl TSerde: serde::Serde<T>, impl TDestruct: Destruct<T>>( contract_address: ContractAddress, function_selector: felt252, ret_data: T, n_times: u32 )`
+
+Mocks contract call to a `function_selector` of a contract at the given address, for `n_times` first calls that are made
+to the contract.
+A call to function `function_selector` will return data provided in `ret_data` argument.
+An address with no contract can be mocked as well.
+An entrypoint that is not present on the deployed contract is also possible to mock.
+Note that the function is not meant for mocking internal calls - it works only for contract entry points.
+
+> `fn start_mock_call<T, impl TSerde: serde::Serde<T>, impl TDestruct: Destruct<T>>( contract_address: ContractAddress, function_selector: felt252, ret_data: T )`
+
+Mocks contract call to a `function_selector` of a contract at the given address, indefinitely.
+See `mock_call` for comprehensive definition of how it can be used.
+
+> `fn stop_mock_call(contract_address: ContractAddress, function_selector: felt252)`
+
+Cancels the `mock_call` / `start_mock_call` for the function `function_selector` of a contract at the given address.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/testing.md "Suggest an edit")
+
+`snforge` lets you test standalone functions from your smart contracts. This technique is referred to as unit testing. You
+should write as many unit tests as possible as these are faster than integration tests.
+
+First, add the following code to the `src/lib.cairo` file:
+
+```rust hljs
+
+fn sum(a: felt252, b: felt252) -> felt252 {
+    return a + b;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::sum;
+
+    #[test]
+    fn test_sum() {
+        assert(sum(2, 3) == 5, 'sum incorrect');
+    }
+}
+```
+
+It is a common practice to keep your unit tests in the same file as the tested code.
+Keep in mind that all tests in `src` folder have to be in a module annotated with `#[cfg(test)]`.
+When it comes to integration tests, you can keep them in separate files in the `tests` directory.
+You can find a detailed explanation of how `snforge` collects tests [here](https://foundry-rs.github.io/starknet-foundry/testing/test-collection.html).
+
+Now run `snforge` using a command:
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 1 test(s) from first_test package
+Running 1 test(s) from src/
+[PASS] first_test::tests::test_sum (gas: ~1)
+Tests: 1 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+If your code panics, the test is considered failed. Here's an example of a failing test.
+
+```rust hljs
+
+fn panicking_function() {
+    let mut data = array![];
+    data.append('panic message');
+    panic(data)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::panicking_function;
+
+    #[test]
+    fn failing() {
+        panicking_function();
+        assert(2 == 2, '2 == 2');
+    }
+}
+```
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 1 test(s) from panicking_test package
+Running 1 test(s) from src/
+[FAIL] panicking_test::tests::failing
+
+Failure data:
+    0x70616e6963206d657373616765 ('panic message')
+
+Tests: 0 passed, 1 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Failures:
+    panicking_test::tests::failing
+
+```
+
+When contract fails, you can get backtrace information by setting the `SNFORGE_BACKTRACE=1` environment variable. Read more about it [here](https://foundry-rs.github.io/starknet-foundry/snforge-advanced-features/backtrace.html).
+
+Sometimes you want to mark a test as expected to fail. This is useful when you want to verify that an action fails as
+expected.
+
+To mark a test as expected to fail, use the `#[should_panic]` attribute.
+
+You can specify the expected failure message in three ways:
+
+1. **With ByteArray**:
+
+```rust hljs
+
+    #[test]
+    #[should_panic(expected: "This will panic")]
+    fn should_panic_exact() {
+        panic!("This will panic");
+    }
+
+    // here the expected message is a substring of the actual message
+    #[test]
+    #[should_panic(expected: "will panic")]
+    fn should_panic_expected_is_substring() {
+        panic!("This will panic");
+    }
+```
+
+With this format, the expected error message needs to be a substring of the actual error message. This is particularly useful when the error message includes dynamic data such as a hash or address.
+
+2. **With felt**
+
+```rust hljs
+
+    #[test]
+    #[should_panic(expected: 'panic message')]
+    fn should_panic_felt_matching() {
+        assert(1 != 1, 'panic message');
+    }
+```
+
+3. **With tuple of felts**:
+
+```rust hljs
+
+    use core::panic_with_felt252;
+
+    #[test]
+    #[should_panic(expected: ('panic message',))]
+    fn should_panic_check_data() {
+        panic_with_felt252('panic message');
+    }
+
+    // works for multiple messages
+    #[test]
+    #[should_panic(expected: ('panic message', 'second message',))]
+    fn should_panic_multiple_messages() {
+        let mut arr = ArrayTrait::new();
+        arr.append('panic message');
+        arr.append('second message');
+        panic(arr);
+    }
+```
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 5 test(s) from should_panic_example package
+Running 5 test(s) from src/
+[PASS] should_panic_example::tests::should_panic_felt_matching (gas: ~1)
+[PASS] should_panic_example::tests::should_panic_multiple_messages (gas: ~1)
+[PASS] should_panic_example::tests::should_panic_exact (gas: ~1)
+[PASS] should_panic_example::tests::should_panic_expected_is_substring (gas: ~1)
+[PASS] should_panic_example::tests::should_panic_check_data (gas: ~1)
+Tests: 5 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+Sometimes you may have tests that you want to exclude during most runs of `snforge test`.
+You can achieve it using `#[ignore]` \- tests marked with this attribute will be skipped by default.
+
+```rust hljs
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    #[ignore]
+    fn ignored_test() { // test code
+    }
+}
+
+```
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 1 test(s) from ignoring_example package
+Running 1 test(s) from src/
+[IGNORE] ignoring_example::tests::ignored_test
+Tests: 0 passed, 0 failed, 0 skipped, 1 ignored, 0 filtered out
+
+```
+
+To run only tests marked with the `#[ignore]` attribute use `snforge test --ignored`.
+To run all tests regardless of the `#[ignore]` attribute use `snforge test --include-ignored`.
+
+> ⚠️ **Recommended only for development** ️⚠️
+>
+> Assert macros package provides a set of macros that can be used to write assertions such as `assert_eq!`.
+> In order to use it, your project must have the `assert_macros` dependency added to the `Scarb.toml` file.
+> These macros are very expensive to run on Starknet, as they result a huge amount of steps and are not recommended for production use.
+> They are only meant to be used in tests.
+> For snforge `v0.31.0` and later, this dependency is added automatically when creating a project using `snforge init`. But for earlier versions, you need to add it manually.
+
+```toml hljs ini
+
+[dev-dependencies]
+snforge_std = ...
+assert_macros = "<scarb-version>"
+
+```
+
+Available assert macros are
+
+- `assert_eq!`
+- `assert_ne!`
+- `assert_lt!`
+- `assert_le!`
+- `assert_gt!`
+- `assert_ge!`- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/chain_id.md "Suggest an edit")
+
+Cheatcodes modifying `chain_id`:
+
+> `fn cheat_chain_id(target: ContractAddress, chain_id: felt252, span: CheatSpan)`
+
+Changes the transaction chain\_id for the given target and span.
+
+> `fn start_cheat_chain_id_global(chain_id: felt252)`
+
+Changes the transaction chain\_id for all targets.
+
+> `fn start_cheat_chain_id(target: ContractAddress, chain_id: felt252)`
+
+Changes the transaction chain\_id for the given target.
+
+> `fn stop_cheat_chain_id(target: ContractAddress)`
+
+Cancels the `cheat_chain_id` / `start_cheat_chain_id` for the given target.
+
+> `fn stop_cheat_chain_id_global()`
+
+Cancels the `start_cheat_chain_id_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library/byte_array.md "Suggest an edit")
+
+Module containing utilities for manipulating `ByteArray` s.
+
+> `fn try_deserialize_bytearray_error(x: Span<felt252>) -> Result<ByteArray, ByteArray>`
+
+This function is meant to transform a serialized output from a contract call into a `ByteArray`.
+Returns the parsed `ByteArray`, or an `Err` with reason, if the parsing failed.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast-library/invoke.md "Suggest an edit")
+
+> `pub fn invoke( contract_address: ContractAddress, entry_point_selector: felt252, calldata: Array::<felt252>, fee_settings: FeeSettings, nonce: Option<felt252> ) -> Result<InvokeResult, ScriptCommandError>`
+
+Invokes a contract and returns `InvokeResult`.
+
+- `contract_address` \- address of the contract to invoke.
+- `entry_point_selector` \- the selector of the function to invoke.
+- `calldata` \- inputs to the function to be invoked.
+- `fee_settings` \- fee settings for the transaction. Can be `Eth` or `Strk`. Read more about it [here](https://foundry-rs.github.io/starknet-foundry/starknet/fees-and-versions.html)
+- `nonce` \- nonce for declare transaction. If not provided, nonce will be set automatically.
+
+```rust hljs
+
+use starknet::ContractAddress;
+use sncast_std::{invoke, InvokeResult, FeeSettings, EthFeeSettings};
+
+fn main() {
+    let contract_address: ContractAddress =
+        0x1e52f6ebc3e594d2a6dc2a0d7d193cb50144cfdfb7fdd9519135c29b67e427
+        .try_into()
+        .expect('Invalid contract address value');
+
+    let result = invoke(
+        contract_address,
+        selector!("put"),
+        array![0x1, 0x2],
+        FeeSettings::Eth(EthFeeSettings { max_fee: Option::None }),
+        Option::None
+    )
+        .expect('invoke failed');
+
+    println!("invoke result: {}", result);
+    println!("debug invoke result: {:?}", result);
+}
+```
+
+Structures used by the command:
+
+```rust hljs
+
+#[derive(Drop, Clone, Debug)]
+pub struct InvokeResult {
+    pub transaction_hash: felt252,
+}
+
+#[derive(Drop, Clone, Debug, Serde, PartialEq)]
+pub struct EthFeeSettings {
+    pub max_fee: Option<felt252>,
+}
+
+#[derive(Drop, Clone, Debug, Serde, PartialEq)]
+pub struct StrkFeeSettings {
+    pub max_fee: Option<felt252>,
+    pub max_gas: Option<u64>,
+    pub max_gas_unit_price: Option<u128>,
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/transaction_hash.md "Suggest an edit")
+
+Cheatcodes modifying `transaction_hash`:
+
+> `fn cheat_transaction_hash(target: ContractAddress, transaction_hash: felt252, span: CheatSpan)`
+
+Changes the transaction hash for the given target and span.
+
+> `fn start_cheat_transaction_hash_global(transaction_hash: felt252)`
+
+Changes the transaction hash for all targets.
+
+> `fn start_cheat_transaction_hash(target: ContractAddress, transaction_hash: felt252)`
+
+Changes the transaction hash for the given target.
+
+> `fn stop_cheat_transaction_hash(target: ContractAddress)`
+
+Cancels the `cheat_transaction_hash` / `start_cheat_transaction_hash` for the given target.
+
+> `fn stop_cheat_transaction_hash_global()`
+
+Cancels the `start_cheat_transaction_hash_global`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/getting-started/scarb.md "Suggest an edit")
+
+[Scarb](https://docs.swmansion.com/scarb) is the package manager and build toolchain for Starknet ecosystem.
+Those coming from Rust ecosystem will find Scarb very similar to [Cargo](https://doc.rust-lang.org/cargo/).
+
+Starknet Foundry uses [Scarb](https://docs.swmansion.com/scarb) to:
+
+- [manage dependencies](https://docs.swmansion.com/scarb/docs/reference/specifying-dependencies.html)
+- [build contracts](https://docs.swmansion.com/scarb/docs/extensions/starknet/contract-target.html)
+
+One of the core concepts of Scarb is its [manifest file](https://docs.swmansion.com/scarb/docs/reference/manifest.html) \- `Scarb.toml`.
+It can be also used to provide [configuration](https://foundry-rs.github.io/starknet-foundry/projects/configuration.html) for Starknet Foundry Forge.
+Moreover, you can modify behaviour of `scarb test` to run `snforge test` as
+described [here](https://docs.swmansion.com/scarb/docs/extensions/testing.html#using-third-party-test-runners).
+
+> 📝 **Note**
+>
+> `Scarb.toml` is specifically designed for configuring scarb packages and, by extension, is suitable for `snforge` configurations,
+> which are package-specific. On the other hand, `sncast` can operate independently of scarb workspaces/packages
+> and therefore utilizes a different configuration file, `snfoundry.toml`. This distinction ensures that configurations
+> are appropriately aligned with their respective tools' operational contexts.
+
+Last but not least, remember that in order to use Starknet Foundry, you must have Scarb
+[installed](https://docs.swmansion.com/scarb/download.html) and added to the `PATH` environment variable.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library/fs.md "Suggest an edit")
+
+Module containing functions for interacting with the filesystem.
+
+```hljs
+
+trait FileTrait {
+    fn new(path: ByteArray) -> File;
+}
+
+```
+
+```rust hljs
+
+trait FileParser<T, +Serde<T>> {
+    fn parse_txt(file: @File) -> Option<T>;
+    fn parse_json(file: @File) -> Option<T>;
+}
+```
+
+```rust hljs
+
+fn read_txt(file: @File) -> Array<felt252>;
+fn read_json(file: @File) -> Array<felt252>;
+```
+
+Some rules have to be checked when providing a file for snforge, in order for correct parsing behavior.
+Different ones apply for JSON and plain text files.
+
+- Elements have to be separated with newlines
+- Elements have to be either:
+  - integers in range of `[0, P)` where P is [`Cairo Prime`](https://book.cairo-lang.org/ch02-02-data-types.html?highlight=prime#felt-type) either in decimal or `0x` prefixed hex format\
+  - single line short strings ( `felt252`) of length `<=31` surrounded by `''` i.e., `'short string'`, new lines can be used with `\n` and `'` with `\'`\
+  - single line strings ( `ByteArray`) surrounded by `""` i.e., `"very very very very loooooong string"`, new lines can be used with `\n` and `"` with `\"`\
+\
+- Elements have to be either:\
+  - integers in range of `[0, P)` where P is [`Cairo Prime`](https://book.cairo-lang.org/ch02-02-data-types.html?highlight=prime#felt-type)\
+  - single line strings ( `ByteArray`) i.e. `"very very very very loooooong string"`, new lines can be used with `\n` and `"` with `\"`\
+  - array of integers or strings fulfilling the above conditions\
+\
+> ⚠️ **Warning**\
+>\
+> A JSON object is an unordered data structure. To make reading JSONs deterministic, the values are read from the JSON in an order that is alphabetical in respect to JSON keys.\
+> Nested JSON values are sorted by the flattened format keys `(a.b.c)`.\
+\
+For example, this plain text file content:\
+\
+```txt hljs plaintext\
+\
+1\
+2\
+'hello'\
+10\
+"world"\
+\
+```\
+\
+or this JSON file content:\
+\
+```json hljs\
+\
+{\
+  "a": 1,\
+  "nested": {\
+    "b": 2,\
+    "c": 448378203247\
+  },\
+  "d": 10,\
+  "e": "world"\
+}\
+\
+```\
+\
+(note that short strings cannot be used in JSON file)\
+\
+could be parsed to the following struct in cairo, via `parse_txt`/ `parse_json`:\
+\
+```rust hljs\
+\
+A {\
+    a: 1,\
+    nested: B {\
+        b: 2,\
+        c: 'hello',\
+    },\
+    d: 10,\
+    e: "world"\
+}\
+```\
+\
+or to an array, via `read_txt`/ `read_json`:\
+\
+```rust hljs\
+\
+array![1, 2, 'hello', 10, 0, 512970878052, 5]\
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/projects/configuration.md "Suggest an edit")
+
+It is possible to configure `snforge` for all test runs through `Scarb.toml`.
+Instead of passing arguments in the command line, set them directly in the file.
+
+```toml hljs ini
+
+# ...
+[tool.snforge]
+exit_first = true
+# ...
+
+```
+
+`snforge` automatically looks for `Scarb.toml` in the directory you are running the tests in or in any of its parents.
+
+To be able to work with the network, you need to supply `sncast` with a few parameters —
+namely the rpc node url and an account name that should be used to interact with it.
+This can be done
+by either supplying `sncast` with those parameters directly [see more detailed CLI description,](https://foundry-rs.github.io/starknet-foundry/appendix/sncast.html)
+or you can put them into `snfoundry.toml` file:
+
+```toml hljs ini
+
+# ...
+[sncast.myprofile]
+account = "user"
+accounts-file = "~/my_accounts.json"
+url = "http://127.0.0.1:5050/rpc"
+# ...
+
+```
+
+With `snfoundry.toml` configured this way, we can just pass `--profile myprofile` argument to make sure `sncast` uses parameters
+defined in the profile.
+
+> 📝 **Note** `snfoundry.toml` file has to be present in current or any of the parent directories.
+
+> 📝 **Note**
+> If there is a profile with the same name in Scarb.toml, scarb will use this profile. If not, scarb will default to using the dev profile.
+> (This applies only to subcommands using scarb - namely `declare` and `script`).
+
+> 💡 **Info**
+> Not all parameters have to be present in the configuration - you can choose to include only some of them and supply
+> the rest of them using CLI flags. You can also override parameters from the configuration using CLI flags.
+
+```shell hljs
+
+$ sncast --profile myprofile \
+    call \
+    --contract-address 0x0589a8b8bf819b7820cb699ea1f6c409bc012c9b9160106ddc3dacd6a89653cf \
+    --function get_balance \
+    --block-id latest
+
+```
+
+Output:
+
+```shell hljs
+
+command: call
+response: [0x0]
+
+```
+
+You can have multiple profiles defined in the `snfoundry.toml`.
+
+There is also an option to set up a default profile, which can be utilized without the need to specify a `--profile`. Here's an example:
+
+```toml hljs ini
+
+# ...
+[sncast.default]
+account = "user123"
+accounts-file = "~/my_accounts.json"
+url = "http://127.0.0.1:5050/rpc"
+# ...
+
+```
+
+With this, there's no need to include the `--profile` argument when using `sncast`.
+
+```shell hljs
+
+$ sncast call \
+    --contract-address 0x0589a8b8bf819b7820cb699ea1f6c409bc012c9b9160106ddc3dacd6a89653cf \
+    --function get_balance \
+    --block-id latest
+
+```
+
+Output:
+
+```shell hljs
+
+command: call
+response: [0x0]
+
+```
+
+Global configuration file is a [`snfoundry.toml`](https://foundry-rs.github.io/starknet-foundry/appendix/snfoundry-toml.html),
+which is a common storage for configurations to apply to multiple projects across various directories.
+This file is stored in a predefined location and is used to store profiles that can be used from any location on your computer.
+
+Global config can be overridden by a local config.
+
+If both local and global profiles with the same name are present, local profile will be combined with global profile. For any setting defined in both profiles, the local setting will take precedence. For settings not defined in the local profile, values from the corresponding global profile will be used, or if not defined, values from the global default profile will be used instead.
+
+This same behavior applies for [default profiles](https://foundry-rs.github.io/starknet-foundry/projects/configuration.html#default-profile) as well. A local default profile will override a global default profile.
+
+> 📝 **Note**
+> Remember that arguments passed in the CLI have the highest priority and will always override the configuration file settings.
+
+The global configuration is stored in a specific location depending on the operating system:
+
+- macOS/Linux : The global configuration file is located at `$HOME/.config/starknet-foundry/snfoundry.toml`
+- Windows : The file can be found at `C:\Users\<user>\AppData\Roaming\starknet-foundry\snfoundry.toml`
+
+> 📝 **Note**
+> If missing, global configuration file will be created automatically on running any `sncast` command for the first time.
+
+```hljs
+
+root/
+├── .config/
+│   └── starknet-foundry/
+│       └── snfoundry.toml -> A
+└── /../../
+        └── projects/
+            ├── snfoundry.toml -> B
+            └── cairo-projects/
+                └── opus-magnum/
+
+```
+
+**Glossary:**
+
+- **A:** Global configuration file containing the profiles [`default`](https://foundry-rs.github.io/starknet-foundry/projects/configuration.html#default-profile) and [`testnet`](https://foundry-rs.github.io/starknet-foundry/projects/configuration.html#defining-profiles-in-snfoundrytoml).
+- **B:** Local configuration file containing the profiles `default` and `mainnet`.
+
+In any directory in the file system, a user can run the `sncast` command using the `default` and `testnet` profiles,
+because they are defined in global config (file A).
+
+If no profiles are explicitly specified, the `default` profile from the global configuration file will be used.
+
+When running `sncast` from the `opus-magnum` directory, there is a configuration file in the parent directory (file B).
+This setup allows for the use of the following profiles: `default`, `testnet`, and `mainnet`. If the `mainnet` profile is specified,
+the configuration from the local file will be used to override the global `default` profile, as the `mainnet` profile does not exist in the global configuration.
+
+Programmers can use environmental variables in both `Scarb.toml::tool::snforge` and in `snfoundry.toml`. To use an environmental variable as a value, use its name prefixed with `$`.
+This might be useful, for example, to hide node urls in the public repositories.
+As an example:
+
+```toml hljs ini
+
+# ...
+[sncast.default]
+account = "my_account"
+accounts-file = "~/my_accounts.json"
+url = "$NODE_URL"
+# ...
+
+```
+
+Variable values are automatically resolved to numbers and booleans (strings `true`, `false`) where possible.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/multicall/run.md "Suggest an edit")
+
+Execute a single multicall transaction containing every call from passed file.
+
+- [`account`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--account--a-account_name)
+
+Required.
+
+Path to a TOML file with call declarations.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Maximum fee for the `invoke` transaction in Fri or Wei depending on fee token or transaction version. When not used, defaults to auto-estimation. Must be greater than zero.
+
+Optional. When not used, defaults to STRK.
+
+Token used for fee payment. Possible values: ETH, STRK.
+
+Optional.
+
+Maximum gas for the `invoke` transaction. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional.
+
+Maximum gas unit price for the `invoke` transaction paid in Fri. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional. When not used, defaults to v3.
+
+Version of the deployment transaction. Possible values: v1, v3.
+
+File example:
+
+```toml hljs ini
+
+[[call]]
+call_type = "deploy"
+class_hash = "0x076e94149fc55e7ad9c5fe3b9af570970ae2cf51205f8452f39753e9497fe849"
+inputs = []
+id = "map_contract"
+unique = false
+
+[[call]]
+call_type = "invoke"
+contract_address = "0x38b7b9507ccf73d79cb42c2cc4e58cf3af1248f342112879bfdf5aa4f606cc9"
+function = "put"
+inputs = ["0x123", "234"]
+
+[[call]]
+call_type = "invoke"
+contract_address = "map_contract"
+function = "put"
+inputs = ["0x123", "234"]
+
+[[call]]
+call_type = "deploy"
+class_hash = "0x2bb3d35dba2984b3d0cd0901b4e7de5411daff6bff5e072060bcfadbbd257b1"
+inputs = ["0x123", "map_contract"]
+unique = false
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/call.md "Suggest an edit")
+
+Starknet Foundry `sncast` supports calling smart contracts on a given network with the `sncast call` command.
+
+The basic inputs that you need for this command are:
+
+- Contract address
+- Function name
+- Inputs to the function
+
+For a detailed CLI description, see the [call command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/call.html).
+
+```shell hljs
+
+$ sncast \
+  call \
+  --url http://127.0.0.1:5055 \
+  --contract-address 0x522dc7cbe288037382a02569af5a4169531053d284193623948eac8dd051716 \
+  --function "balance_of" \
+  --arguments '0x0554d15a839f0241ba465bb176d231730c01cf89cdcb95fe896c51d4a6f4bb8f'
+
+```
+
+Output:
+
+```shell hljs
+
+command: call
+response: [0x0, 0x0]
+
+```
+
+> 📝 **Note**
+> Call does not require passing account-connected parameters ( `account` and `accounts-file`) because it doesn't create a transaction.
+
+You can call a contract at the specific block by passing `--block-id` argument.
+
+```shell hljs
+
+$ sncast call \
+  --url http://127.0.0.1:5055 \
+  --contract-address 0x522dc7cbe288037382a02569af5a4169531053d284193623948eac8dd051716 \
+  --function "balance_of" \
+  --arguments '0x0554d15a839f0241ba465bb176d231730c01cf89cdcb95fe896c51d4a6f4bb8f' \
+  --block-id 77864
+
+```
+
+Output:
+
+```shell hljs
+
+command: call
+response: [0x0, 0x0]
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library/contract_class.md "Suggest an edit")
+
+A struct which enables interaction with given class hash.
+It can be obtained by using [declare](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/declare.html), or created with an arbitrary `ClassHash`.
+
+```rust hljs
+
+struct ContractClass {
+    class_hash: ClassHash,
+}
+```
+
+```rust hljs
+
+trait ContractClassTrait {
+    fn precalculate_address(
+        self: @ContractClass, constructor_calldata: @Array::<felt252>
+    ) -> ContractAddress;
+
+    fn deploy(
+        self: @ContractClass, constructor_calldata: @Array::<felt252>
+    ) -> SyscallResult<(ContractAddress, Span<felt252>)>;
+
+    fn deploy_at(
+        self: @ContractClass,
+        constructor_calldata: @Array::<felt252>,
+        contract_address: ContractAddress
+    ) -> SyscallResult<(ContractAddress, Span<felt252>)>;
+
+    fn new<T, +Into<T, ClassHash>>(class_hash: T) -> ContractClass;
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/getting-started/installation.md "Suggest an edit")
+
+Starknet Foundry is easy to install on Linux, macOS and Windows.
+In this section, we will walk through the process of installing Starknet Foundry.
+
+- [Installation](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#installation)
+  - [Contents](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#contents)
+  - [Requirements](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#requirements)
+  - [Linux and macOS](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#linux-and-macos)
+    - [Install Rust version >= 1.80.1](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-rust-version--1801)
+    - [Install asdf](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-asdf)
+    - [Install Scarb version >= 2.7.0](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-scarb-version--270)
+    - [Install Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-starknet-foundry)
+  - [Windows](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#windows)
+    - [Install Rust version >= 1.80.1](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-rust-version--1801-1)
+    - [Install Scarb version >= 2.7.0](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-scarb-version--270-1)
+    - [Install Universal Sierra Compiler](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-universal-sierra-compiler)
+    - [Install Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-starknet-foundry-1)
+  - [Common Errors](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#common-errors)
+    - [No Version Set (Linux and macOS Only)](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#no-version-set-linux-and-macos-only)
+    - [Invalid Rust Version](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#invalid-rust-version)
+      - [Linux and macOS](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#linux-and-macos-1)
+      - [Windows](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#windows-1)
+    - [`scarb test` Isn’t Running `snforge`](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#scarb-test-isnt-running-snforge)
+  - [Universal-Sierra-Compiler update](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#universal-sierra-compiler-update)
+    - [Linux and macOS](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#linux-and-macos-2)
+    - [Windows](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#windows-2)
+  - [How to build Starknet Foundry from source code](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#how-to-build-starknet-foundry-from-source-code)
+
+> 📝 **Note**
+>
+> Ensure all requirements are installed and follow the required minimum versions.
+> Starknet Foundry will not run if not following these requirements.
+
+To use Starknet Foundry, you need:
+
+- [Scarb](https://docs.swmansion.com/scarb/download.html) version >= 2.7.0
+- [Universal-Sierra-Compiler](https://github.com/software-mansion/universal-sierra-compiler)
+- [Rust](https://www.rust-lang.org/tools/install) version >= 1.80.1
+
+all installed and added to your `PATH` environment variable.
+
+> 📝 **Note**
+>
+> `Universal-Sierra-Compiler` will be automatically installed if you use `asdf` or `snfoundryup`.
+> You can also create `UNIVERSAL_SIERRA_COMPILER` env var to make it visible for `snforge`.
+
+> ℹ️ **Info**
+>
+> If you already have installed Rust, Scarb and asdf simply run
+> `asdf plugin add starknet-foundry`
+
+> ℹ️ **Info**
+>
+> `snforge` relies on Scarb's [_procedural macros_](https://github.com/foundry-rs/starknet-foundry/issues/2299) to
+> create
+> `snforge_scarb_plugin` which is a part of `snforge_std`.
+> This plugin is required for `snforge` test to work.
+> Currently, _procedural macros_ require Rust installation to function.
+> This will be changed in the upcoming versions of Scarb.
+
+```shell hljs
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+```
+
+To verify that correct Rust version was installed, run
+
+```shell hljs
+
+rustc --version
+
+```
+
+and verify that version is >= 1.80.1
+
+See [Rust docs](https://doc.rust-lang.org/beta/book/ch01-01-installation.html#installation) for more details.
+
+Follow the instructions from [asdf docs](https://asdf-vm.com/guide/getting-started.html#getting-started).
+
+To verify that asdf was installed, run
+
+```shell hljs
+
+asdf --version
+
+```
+
+First, add Scarb plugin to asdf
+
+```shell hljs
+
+asdf plugin add scarb
+
+```
+
+Install Scarb
+
+```shell hljs
+
+asdf install scarb latest
+
+```
+
+To verify that Scarb was installed, run
+
+```shell hljs
+
+scarb --version
+
+```
+
+and verify that version is >= 2.7.0
+
+First, add Starknet Foundry plugin to asdf
+
+```shell hljs
+
+asdf plugin add starknet-foundry
+
+```
+
+Install Starknet Foundry
+
+```shell hljs
+
+asdf install starknet-foundry latest
+
+```
+
+To verify that Starknet Foundry was installed, run
+
+```shell hljs
+
+snforge --version
+
+```
+
+or
+
+```shell hljs
+
+sncast --version
+
+```
+
+> 🐧 **Info** \- WSL (Windows Subsystem for Linux)
+>
+> Starknet Foundry can be installed natively on Windows, but currently, for smoother experience, it is recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+>
+> If you are using WSL, please follow the [Linux and macOS](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#linux-and-macos) guide.
+
+> ℹ️ **Info**
+>
+> `snforge` relies on Scarb's [_procedural macros_](https://github.com/foundry-rs/starknet-foundry/issues/2299) to
+> create
+> `snforge_scarb_plugin` which is a part of `snforge_std`.
+> This plugin is required for `snforge` test to work.
+> Currently, _procedural macros_ require Rust installation to function.
+> This will be changed in the upcoming versions of Scarb.
+
+Go to [https://www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install) and follow the installation instructions.
+
+To verify that correct Rust version was installed, run
+
+```shell hljs
+
+rustc --version
+
+```
+
+and verify that version is >= 1.80.1
+
+See [Rust docs](https://doc.rust-lang.org/beta/book/ch01-01-installation.html#installation) for more details.
+
+Follow the instructions from [Scarb docs](https://docs.swmansion.com/scarb/download.html#windows).
+
+1. Download the release archive matching your CPU architecture
+from [https://docs.swmansion.com/scarb/download.html#precompiled-packages](https://docs.swmansion.com/scarb/download.html#precompiled-packages).
+2. Extract it to a location where you would like to have Scarb installed. We recommend `%LOCALAPPDATA%\Programs\scarb`.
+3. From this directory, get the full path to `scarb\bin` and add it to PATH.
+See [this article](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) for instructions on
+Windows 10 and 11.
+
+To verify that Scarb was installed, run
+
+```shell hljs
+
+scarb --version
+
+```
+
+and verify that version is >= 2.7.0
+
+1. Download the release archive matching your CPU architecture
+from [https://github.com/software-mansion/universal-sierra-compiler/releases/latest](https://github.com/software-mansion/universal-sierra-compiler/releases/latest). Look for package with `windows`
+in the name e.g.
+`universal-sierra-compiler-v2.3.0-x86_64-pc-windows-msvc.zip`.
+2. Extract it to a location where you would like to have Starknet Foundry installed. We recommend
+`%LOCALAPPDATA%\Programs\universal-sierra-compiler`.
+3. From this directory, get the full path to `universal-sierra-compiler\bin` and add it to PATH.
+See [this article](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) for instructions on
+Windows 10 and 11.
+
+To verify that Starknet Foundry was installed, run
+
+```shell hljs
+
+universal-sierra-compiler --version
+
+```
+
+1. Download the release archive matching your CPU architecture
+from [https://github.com/foundry-rs/starknet-foundry/releases/latest](https://github.com/foundry-rs/starknet-foundry/releases/latest). Look for package with `windows` in the name e.g.
+`starknet-foundry-v0.34.0-x86_64-pc-windows-msvc.zip`.
+2. Extract it to a location where you would like to have Starknet Foundry installed. We recommend
+`%LOCALAPPDATA%\Programs\snfoundry`.
+3. From this directory, get the full path to `snfoundry\bin` and add it to PATH.
+See [this article](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) for instructions on
+Windows 10 and 11.
+
+To verify that Starknet Foundry was installed, run
+
+```shell hljs
+
+snforge --version
+
+```
+
+or
+
+```shell hljs
+
+sncast --version
+
+```
+
+Users may encounter this error when trying to use `snforge` or `sncast` without setting a version:
+
+```shell hljs
+
+No version is set for command snforge
+Consider adding one of the following versions in your config file at $HOME/.tool_versions
+starknet-foundry 0.32.0
+
+```
+
+This error indicates that `Starknet Foundry` version is unset. To resolve it, set the version globally using asdf:
+
+```shell hljs
+
+asdf global starknet-foundry <version>
+
+```
+
+For additional information on asdf version management, see
+the [asdf](https://asdf-vm.com/guide/getting-started.html#_6-set-a-version)
+
+When running any `snforge` command, error similar to this is displayed
+
+```shell hljs
+
+Compiling snforge_scarb_plugin v0.34.0
+error: package snforge_scarb_plugin v0.34.0 cannot be built because it requires rustc 1.80.1 or newer, while the currently active rustc version is 1.76.0
+
+```
+
+This indicates incorrect Rust version is installed or set.
+
+Verify if rust version >= 1.80.1 is installed
+
+```shell hljs
+
+rustc --version
+1.80.1
+
+```
+
+To fix, follow the platform specific instructions:
+
+If the version is incorrect or the error persists, try changing the global version of Rust
+
+```shell hljs
+
+rustup default stable
+
+```
+
+and local version of Rust
+
+```shell hljs
+
+rustup override set stable
+
+```
+
+Follow [Rust installation](https://www.rust-lang.org/tools/install) and ensure correct version of rust was added to
+PATH.
+
+By default, `scarb test` doesn't use `snforge` to run tests, and it needs to be configured.
+Make sure to include this section in `Scarb.toml`
+
+```toml hljs ini
+
+[scripts]
+test = "snforge test"
+
+```
+
+If you would like to bump the USC manually (e.g. when the new Sierra version is released) you can do it by running:
+
+```shell hljs
+
+curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
+
+```
+
+Follow [Universal Sierra Compiler installation for Windows](https://foundry-rs.github.io/starknet-foundry/getting-started/installation.html#install-universal-sierra-compiler).
+
+If you are unable to install Starknet Foundry using the instructions above, you can try building it from
+the [source code](https://github.com/foundry-rs/starknet-foundry) as follows:
+
+1. [Set up a development environment.](https://foundry-rs.github.io/starknet-foundry/development/environment-setup.html)
+2. Run `cd starknet-foundry && cargo build --release`. This will create a `target` directory.
+3. Move the `target` directory to the desired location (e.g. `~/.starknet-foundry`).
+4. Add `DESIRED_LOCATION/target/release/` to your `PATH`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/testing-workspaces.md "Suggest an edit")
+
+`snforge` supports Scarb Workspaces.
+To make sure you know how workspaces work,
+check Scarb documentation [here](https://docs.swmansion.com/scarb/docs/reference/workspaces.html).
+
+When running `snforge test` in a Scarb workspace with a root package, it will only run tests inside the root package.
+
+For a project structure like this
+
+```shell hljs
+
+$ tree . -L 3
+
+```
+
+Output:
+
+```shell hljs
+
+.
+├── Scarb.toml
+├── crates
+│   ├── addition
+│   │   ├── Scarb.toml
+│   │   ├── src
+│   │   └── tests
+│   └── fibonacci
+│       ├── Scarb.toml
+│       └── src
+├── tests
+│   └── test.cairo
+└── src
+    └── lib.cairo
+
+```
+
+only the tests in `./src` and `./tests` folders will be executed.
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 3 test(s) from hello_workspaces package
+Running 1 test(s) from src/
+[PASS] hello_workspaces::tests::test_simple (gas: ~1)
+Running 2 test(s) from tests/
+[FAIL] hello_workspaces_integrationtest::test_failing::test_failing
+
+Failure data:
+    0x6661696c696e6720636865636b ('failing check')
+
+[FAIL] hello_workspaces_integrationtest::test_failing::test_another_failing
+
+Failure data:
+    0x6661696c696e6720636865636b ('failing check')
+
+Tests: 1 passed, 2 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Failures:
+    hello_workspaces_integrationtest::test_failing::test_failing
+    hello_workspaces_integrationtest::test_failing::test_another_failing
+
+```
+
+To select the specific package to test, pass a `--package package_name` (or `-p package_name` for short) flag.
+You can also run `snforge test` from the package directory to achieve the same effect.
+
+```shell hljs
+
+$ snforge test --package addition
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 5 test(s) from addition package
+Running 4 test(s) from tests/
+[PASS] addition_integrationtest::nested::test_nested::test_two (gas: ~1)
+[PASS] addition_integrationtest::nested::test_nested::test_two_and_two (gas: ~1)
+[PASS] addition_integrationtest::nested::simple_case (gas: ~1)
+[PASS] addition_integrationtest::nested::contract_test (gas: ~1)
+Running 1 test(s) from src/
+[PASS] addition::tests::it_works (gas: ~1)
+Tests: 5 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+You can also pass `--workspace` flag to run tests for all packages in the workspace.
+
+```shell hljs
+
+$ snforge test --workspace
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 5 test(s) from addition package
+Running 4 test(s) from tests/
+[PASS] addition_integrationtest::nested::test_nested::test_two (gas: ~1)
+[PASS] addition_integrationtest::nested::simple_case (gas: ~1)
+[PASS] addition_integrationtest::nested::test_nested::test_two_and_two (gas: ~1)
+[PASS] addition_integrationtest::nested::contract_test (gas: ~1)
+Running 1 test(s) from src/
+[PASS] addition::tests::it_works (gas: ~1)
+Tests: 5 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Collected 6 test(s) from fibonacci package
+Running 2 test(s) from src/
+[PASS] fibonacci::tests::it_works (gas: ~1)
+[PASS] fibonacci::tests::contract_test (gas: ~1)
+Running 4 test(s) from tests/
+[FAIL] fibonacci_tests::abc::efg::failing_test
+
+Failure data:
+    0x0 ('')
+
+[PASS] fibonacci_tests::abc::efg::efg_test (gas: ~1)
+[PASS] fibonacci_tests::lib_test (gas: ~1)
+[PASS] fibonacci_tests::abc::abc_test (gas: ~1)
+Tests: 5 passed, 1 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Collected 3 test(s) from hello_workspaces package
+Running 1 test(s) from src/
+[PASS] hello_workspaces::tests::test_simple (gas: ~1)
+Running 2 test(s) from tests/
+[FAIL] hello_workspaces_integrationtest::test_failing::test_another_failing
+
+Failure data:
+    0x6661696c696e6720636865636b ('failing check')
+
+[FAIL] hello_workspaces_integrationtest::test_failing::test_failing
+
+Failure data:
+    0x6661696c696e6720636865636b ('failing check')
+
+Tests: 1 passed, 2 failed, 0 skipped, 0 ignored, 0 filtered out
+
+Failures:
+    fibonacci_tests::abc::efg::failing_test
+    hello_workspaces_integrationtest::test_failing::test_another_failing
+    hello_workspaces_integrationtest::test_failing::test_failing
+
+```
+
+`--package` and `--workspace` flags are mutually exclusive, adding both of them to a `snforge test` command will result in an error.
+
+Running `snforge test` command in a virtual workspace (a workspace without a root package)
+outside any package will by default run tests for all the packages.
+It is equivalent to running `snforge test` with the `--workspace` flag.
+
+To select a specific package to test,
+you can use the `--package` flag the same way as in regular workspaces or run `snforge test` from the package directory.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/account/list.md "Suggest an edit")
+
+List all available accounts.
+
+Account information will be retrieved from the file specified in user's environment.
+The output format is dependent on user's configuration, either provided via CLI or specified in `snfoundry.toml`.
+Hides user's private keys by default.
+
+> ⚠️ **Warning**
+> This command outputs cryptographic information about accounts, e.g. user's private key.
+> Use it responsibly to not cause any vulnerabilities to your environment and confidential data.
+
+- [`accounts-file`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--accounts-file--f-path_to_accounts_file)
+
+- [`int-format`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/list.html)
+- [`hex-format`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/list.html)
+- [`json`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/account/list.html)
+
+Optional.
+
+If passed, show private keys along with the rest of the account information.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/snforge-advanced-features/profiling.md "Suggest an edit")
+
+Profiling is what allows developers to get more insight into how the transaction is executed.
+You can inspect the call tree, see how many resources are used for different parts of the execution, and more!
+
+## [cairo-profiler](https://github.com/software-mansion/cairo-profiler)
+
+`snforge` is able to produce a file with a trace for each passing test (excluding fuzz tests).
+All you have to do is use the [`--save-trace-data`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge/test.html#--save-trace-data) flag:
+
+```shell hljs
+
+$ snforge test --save-trace-data
+
+```
+
+The files with traces will be saved to `snfoundry_trace` directory. Each one of these files can then be used as an input
+for the [cairo-profiler](https://github.com/software-mansion/cairo-profiler).
+
+If you want `snforge` to call `cairo-profiler` on generated files automatically, use [`--build-profile`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge/test.html#--build-profile) flag:
+
+```shell hljs
+
+$ snforge test --build-profile
+
+```
+
+The files with profiling data will be saved to `profile` directory.
+
+You can pass additional arguments to `cairo-profiler` by using the `--` separator. Everything after `--` will be passed
+to `cairo-profiler`:
+
+```shell hljs
+
+$ snforge test --build-profile -- --show-inlined-functions
+
+```
+
+> 📝 **Note**
+>
+> Running `snforge test --help` won't show info about `cairo-profiler` flags. To see them, run `snforge test --build-profile -- --help`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/multicall.md "Suggest an edit")
+
+Starknet Foundry `sncast` supports executing multiple deployments or calls with the `sncast multicall run` command.
+
+> 📝 **Note** `sncast multicall run` executes only one transaction containing all the prepared calls. Which means the fee is paid once.
+
+You need to provide a **path** to a `.toml` file with declarations of desired operations that you want to execute.
+
+You can also compose such config `.toml` file with the `sncast multicall new` command.
+
+For a detailed CLI description, see the [multicall command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/multicall/multicall.html).
+
+Example file:
+
+```toml hljs ini
+
+[[call]]
+call_type = "deploy"
+class_hash = "0x076e94149fc55e7ad9c5fe3b9af570970ae2cf51205f8452f39753e9497fe849"
+inputs = []
+id = "map_contract"
+unique = false
+
+[[call]]
+call_type = "invoke"
+contract_address = "map_contract"
+function = "put"
+inputs = ["0x123", 234]  # Numbers can be used directly without quotes
+
+```
+
+After running `sncast multicall run --path file.toml`, a declared contract will be first deployed, and then its function `put` will be invoked.
+
+> 📝 **Note**
+> The example above demonstrates the use of the `id` property in a deploy call, which is then referenced as the `contract address` in an invoke call.
+> Additionally, the `id` can be referenced in the inputs of deploy and invoke calls 🔥
+
+> 💡 **Info**
+> Inputs can be either strings (like `"0x123"`) or numbers (like `234`).
+
+> 📝 **Note**
+> For numbers larger than 2^63 - 1 (that can't fit into `i64`), use string format (e.g., `"9223372036854775808"`) due to TOML parser limitations.
+
+```shell hljs
+
+$ sncast multicall run --path multicall_example.toml
+
+```
+
+Output:
+
+```shell hljs
+
+command: multicall
+transaction_hash: [..]
+
+To see invocation details, visit:
+transaction: https://sepolia.starkscan.co/tx/[..]
+
+```
+
+> 💡 **Info**
+> Max fee will be automatically computed if `--max-fee <MAX_FEE>` is not passed.
+
+You can also generate multicall template with `multicall new` command, specifying output path.
+
+```shell hljs
+
+$ sncast multicall new ./template.toml
+
+```
+
+Output:
+
+```shell hljs
+
+command: multicall new
+content: [[call]]
+call_type = "deploy"
+class_hash = ""
+inputs = []
+id = ""
+unique = false
+
+[[call]]
+call_type = "invoke"
+contract_address = ""
+function = ""
+inputs = []
+
+path: ./template.toml
+
+```
+
+> ⚠️ **Warning**
+> Trying to pass any existing file as an output for `multicall new` will result in error, as the command doesn't overwrite by default.
+
+If there is a file with the same name as provided, it can be overwritten.
+
+```shell hljs
+
+$ sncast multicall new ./template.toml --overwrite
+
+```
+
+Output:
+
+```shell hljs
+
+command: multicall new
+content: [[call]]
+call_type = "deploy"
+class_hash = ""
+inputs = []
+id = ""
+unique = false
+
+[[call]]
+call_type = "invoke"
+contract_address = ""
+function = ""
+inputs = []
+
+path: ./template.toml
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/verify.md "Suggest an edit")
+
+Verify Cairo contract on a chosen verification provider.
+
+Required.
+
+The address of the contract that is to be verified.
+
+Required.
+
+The name of the contract. The contract name is the part after the `mod` keyword in your contract file.
+
+Optional.
+
+The verification provider to use for the verification. Possible values are:
+
+- `walnut`
+
+Required.
+
+The network on which block explorer will perform the verification. Possible values are:
+
+- `mainnet`
+- `sepolia`
+
+Optional.
+
+Name of the package that should be used.
+
+If supplied, a contract from this package will be used. Required if more than one package exists in a workspace.
+
+Optional.
+
+If passed, assume "yes" as answer to confirmation prompt and run non-interactively.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/declare.md "Suggest an edit")
+
+Send a declare transaction of Cairo contract to Starknet.
+
+- [`account`](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/common.html#--account--a-account_name)
+
+Required.
+
+Name of the contract. Contract name is a part after the mod keyword in your contract file.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Maximum fee for the `declare` transaction in Fri or Wei depending on fee token or transaction version. When not used, defaults to auto-estimation. Must be greater than zero.
+
+Optional. When not used, defaults to STRK.
+
+Token used for fee payment. Possible values: ETH, STRK.
+
+Optional.
+
+Maximum gas for the `declare` transaction. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional.
+
+Maximum gas unit price for the `declare` transaction paid in Fri. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional. When not used, defaults to v3.
+
+Version of the deployment transaction. Possible values: v2, v3.
+
+Optional.
+
+Nonce for transaction. If not provided, nonce will be set automatically.
+
+Optional.
+
+Name of the package that should be used.
+
+If supplied, a contract from this package will be used. Required if more than one package exists in a workspace.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/account/create.md "Suggest an edit")
+
+Prepare all prerequisites for account deployment.
+
+Account information will be saved to the file specified by `--accounts-file` argument,
+which is `~/.starknet_accounts/starknet_open_zeppelin_accounts.json` by default.
+
+Required.
+
+Account name under which account information is going to be saved.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional. Required if `--class-hash` is passed.
+
+Type of the account. Possible values: oz, argent, braavos. Defaults to oz.
+
+Versions of the account contracts:
+
+| Account Contract | Version | Class Hash |
+| --- | --- | --- |
+| `oz` | v0.14.0 | [0x00e2eb8f5672af4e6a4e8a8f1b44989685e668489b0a25437733756c5a34a1d6](https://starkscan.co/class/0x00e2eb8f5672af4e6a4e8a8f1b44989685e668489b0a25437733756c5a34a1d6) |
+| `argent` | v0.3.1 | [0x029927c8af6bccf3f6fda035981e765a7bdbf18a2dc0d630494f8758aa908e2b](https://starkscan.co/class/0x029927c8af6bccf3f6fda035981e765a7bdbf18a2dc0d630494f8758aa908e2b) |
+| `braavos` | v1.0.0 | [0x00816dd0297efc55dc1e7559020a3a825e81ef734b558f03c83325d4da7e6253](https://starkscan.co/class/0x00816dd0297efc55dc1e7559020a3a825e81ef734b558f03c83325d4da7e6253) |
+
+Optional.
+
+Salt for the account address. If omitted random one will be generated.
+
+Optional.
+
+If passed, a profile with corresponding name will be added to the local snfoundry.toml.
+
+Optional.
+
+Class hash of a custom openzeppelin account contract declared to the network.
+
+Optional.
+
+If passed, the command will not trigger an interactive prompt to add an account as a default- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/development/environment-setup.md "Suggest an edit")
+
+> 💡 **Info**
+> This tutorial is only relevant if you wish to contribute to Starknet Foundry.
+> If you plan to only use it as a tool for your project, you can skip this part.
+
+Install the latest stable [Rust](https://www.rust-lang.org/tools/install) version.
+If you already have Rust installed make sure to upgrade it by running
+
+```shell hljs
+
+$ rustup update
+
+```
+
+You can read more about installing Scarb [here](https://docs.swmansion.com/scarb/download.html).
+
+Please make sure you're using Scarb installed via [asdf](https://asdf-vm.com/) \- otherwise some tests may fail.
+
+> To verify, run:
+>
+> ```shell hljs
+>
+> $ which scarb
+>
+> ```
+>
+> the result of which should be:
+>
+> ```shell hljs
+>
+> $HOME/.asdf/shims/scarb
+>
+> ```
+>
+> If you previously installed scarb using an official installer, you may need to remove this installation or modify your PATH to make sure asdf installed one is always used.
+
+You can read more
+about installing `cairo-profiler` [here](https://github.com/software-mansion/cairo-profiler?tab=readme-ov-file#installation).
+
+> ❗️ **Warning**
+>
+> If you haven't pushed your branch to the remote yet (you've been working only locally), two tests will fail:
+>
+> - `e2e::running::init_new_project_test`
+> - `e2e::running::simple_package_with_git_dependency`
+>
+> After pushing the branch to the remote, those tests should pass.
+
+To install it run `./scripts/install_devnet.sh`
+
+Install the latest [universal-sierra-compiler](https://github.com/software-mansion/universal-sierra-compiler) version.
+
+Tests can be run with:
+
+```shell hljs
+
+$ cargo test
+
+```
+
+Starknet Foundry uses [rustfmt](https://github.com/rust-lang/rustfmt) for formatting. You can run the formatter with
+
+```shell hljs
+
+$ cargo fmt
+
+```
+
+For linting, it uses [clippy](https://github.com/rust-lang/rust-clippy). You can run it with this command:
+
+```shell hljs
+
+$ cargo clippy --all-targets --all-features -- --no-deps -W clippy::pedantic -A clippy::missing_errors_doc -A clippy::missing_panics_doc -A clippy::default_trait_access
+
+```
+
+Or using our defined alias
+
+```shell hljs
+
+$ cargo lint
+
+```
+
+Starknet Foundry uses [typos](https://github.com/marketplace/actions/typos-action) for spelling checks.
+
+You can run the checker with
+
+```shell hljs
+
+$ typos
+
+```
+
+Some typos can be automatically fixed by running
+
+Output:
+
+```shell hljs
+
+$ typos -w
+
+```
+
+Read the general contribution guideline [here](https://github.com/foundry-rs/starknet-foundry/blob/master/CONTRIBUTING.md)- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/starknet/tx-status.md "Suggest an edit")
+
+Starknet Foundry `sncast` supports the inspection of transaction statuses on a given network with the `sncast tx-status` command.
+
+For a detailed CLI description, refer to the [tx-status command reference](https://foundry-rs.github.io/starknet-foundry/appendix/sncast/tx-status.html).
+
+You can track the details about the execution and finality status of a transaction in the given network by using the transaction hash as shown below:
+
+```shell hljs
+
+$ sncast \
+ tx-status \
+ 0x07d2067cd7675f88493a9d773b456c8d941457ecc2f6201d2fe6b0607daadfd1 \
+ --url https://starknet-sepolia.public.blastapi.io
+
+```
+
+Output:
+
+```shell hljs
+
+command: tx-status
+execution_status: Succeeded
+finality_status: AcceptedOnL1
+
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library.md "Suggest an edit")
+
+> ℹ️ **Info**
+> Full documentation for the `snforge` library can be found [here](https://foundry-rs.github.io/starknet-foundry/snforge_std/).
+
+- [`declare`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/declare.html) \- declares a contract and returns
+a [`ContractClass`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/contract_class.html) which can be interacted with later
+- [`get_call_trace`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/get_call_trace.html) \- gets current test call trace (with contracts interactions
+included)
+- [`fs`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/fs.html) \- module containing functions for interacting with the filesystem
+- [`env`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/env.html) \- module containing functions for interacting with the system environment
+- [`signature`](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/signature.html) \- module containing struct and trait for creating `ecdsa` signatures
+
+> ℹ️ **Info**
+> To use cheatcodes you need to add `snforge_std` package as a development dependency in
+> your [`Scarb.toml`](https://docs.swmansion.com/scarb/docs/guides/dependencies.html#development-dependencies)
+> using the appropriate version.
+>
+> ```toml hljs ini
+>
+> [dev-dependencies]
+> snforge_std = "0.33.0"
+>
+> ```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/snforge-library/env.md "Suggest an edit")
+
+Module containing functions for interacting with the system environment.
+
+> `fn var(name: ByteArray) -> Array<felt252>`
+
+Reads an environment variable, without parsing it.
+
+The serialized output is correlated with the inferred input type, same as
+during [reading from a file](https://foundry-rs.github.io/starknet-foundry/appendix/snforge-library/fs.html#file-format).
+
+> 📝 **Note**
+>
+> If you want snfoundry to treat your variable like a short string, surround it with 'single quotes'.
+>
+> If you would like it to be serialized as a `ByteArray`, use "double quoting". It will be then de-serializable
+> with `Serde`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/cheatcodes/store.md "Suggest an edit")
+
+> `fn store(target: ContractAddress, storage_address: felt252, serialized_value: Span<felt252>)`
+
+Stores felts from `serialized_value` in `target` contract's storage, starting at `storage_address`.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/running-tests.md "Suggest an edit")
+
+To run tests with `snforge`, simply run the `snforge test` command from the package directory.
+
+```shell hljs
+
+$ snforge test
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 3 test(s) from hello_snforge package
+Running 0 test(s) from src/
+Running 3 test(s) from tests/
+[PASS] hello_snforge_integrationtest::test_contract::test_calling (gas: ~1)
+[PASS] hello_snforge_integrationtest::test_contract::test_executing (gas: ~1)
+[PASS] hello_snforge_integrationtest::test_contract::test_calling_another (gas: ~1)
+Tests: 3 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+You can pass a filter string after the `snforge test` command to filter tests.
+By default, any test with an [absolute module tree path](https://book.cairo-lang.org/ch07-03-paths-for-referring-to-an-item-in-the-module-tree.html#paths-for-referring-to-an-item-in-the-module-tree) matching the filter will be run.
+
+```shell hljs
+
+$ snforge test calling
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 2 test(s) from hello_snforge package
+Running 0 test(s) from src/
+Running 2 test(s) from tests/
+[PASS] hello_snforge_integrationtest::test_contract::test_calling_another (gas: ~1)
+[PASS] hello_snforge_integrationtest::test_contract::test_calling (gas: ~1)
+Tests: 2 passed, 0 failed, 0 skipped, 0 ignored, 1 filtered out
+
+```
+
+To run a specific test, you can pass a filter string along with an `--exact` flag.
+Note, you have to use a fully qualified test name, including a module name.
+
+> 📝 **Note**
+>
+> Running a specific test results in optimized compilation. `snforge` will try to compile only the desired test, unlike the case of running all tests where all of them are compiled.
+
+```shell hljs
+
+$ snforge test hello_snforge_integrationtest::test_contract::test_calling --exact
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 1 test(s) from hello_snforge package
+Running 1 test(s) from tests/
+[PASS] hello_snforge_integrationtest::test_contract::test_calling (gas: ~1)
+Running 0 test(s) from src/
+Tests: 1 passed, 0 failed, 0 skipped, 0 ignored, other filtered out
+
+```
+
+To stop the test execution after first failed test, you can pass an `--exit-first` flag along with `snforge test` command.
+
+```shell hljs
+
+$ snforge test --exit-first
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 3 test(s) from failing_example package
+Running 3 test(s) from tests/
+[FAIL] failing_example_tests::test_failing
+
+Failure data:
+    0x6661696c696e6720636865636b ('failing check')
+
+Failures:
+    failing_example_tests::test_failing
+
+Tests: 0 passed, 1 failed, 2 skipped, 0 ignored, 0 filtered out
+
+```
+
+To track resources like `builtins` / `syscalls` that are used when running tests, use `snforge test --detailed-resources`.
+
+```shell hljs
+
+$ snforge test --detailed-resources
+
+```
+
+Output:
+
+```shell hljs
+
+Collected 2 test(s) from hello_starknet package
+Running 2 test(s) from tests/
+[PASS] hello_starknet_integrationtest::test_contract::test_cannot_increase_balance_with_zero_value (gas: ~105)
+        steps: 3405
+        memory holes: 22
+        builtins: (range_check: 77, pedersen: 7)
+        syscalls: (CallContract: 2, StorageRead: 1, Deploy: 1)
+
+[PASS] hello_starknet_integrationtest::test_contract::test_increase_balance (gas: ~172)
+        steps: 4535
+        memory holes: 15
+        builtins: (range_check: 95, pedersen: 7)
+        syscalls: (CallContract: 3, StorageRead: 3, Deploy: 1, StorageWrite: 1)
+
+Running 0 test(s) from src/
+Tests: 2 passed, 0 failed, 0 skipped, 0 ignored, 0 filtered out
+
+```
+
+For more information about how starknet-foundry calculates those, see [gas and resource estimation](https://foundry-rs.github.io/starknet-foundry/testing/gas-and-resource-estimation.html) section.- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/testing/testing-messages-to-l1.md "Suggest an edit")
+
+There exists a functionality allowing you to spy on messages sent to L1, similar to [spying events](https://foundry-rs.github.io/starknet-foundry/testing/testing-events.html).
+
+[Check the appendix for an exact API, structures and traits reference](https://foundry-rs.github.io/starknet-foundry/appendix/cheatcodes/spy_messages_to_l1.html)
+
+Asserting messages to L1 is much simpler, since they are not wrapped with any structures in Cairo code (they are a plain `felt252` array and an L1 address).
+In `snforge` they are expressed with a structure:
+
+```rust hljs
+
+/// Raw message to L1 format (as seen via the RPC-API), can be used for asserting the sent messages.
+struct MessageToL1 {
+    /// An ethereum address where the message is destined to go
+    to_address: starknet::EthAddress,
+    /// Actual payload which will be delivered to L1 contract
+    payload: Array<felt252>
+}
+```
+
+Similarly, you can use `snforge` library and call `spy_messages_to_l1()` to initiate a spy:
+
+```rust hljs
+
+use snforge_std::{spy_messages_to_l1};
+
+#[test]
+fn test_spying_l1_messages() {
+    let mut spy = spy_messages_to_l1();
+    // ...
+}
+```
+
+With the spy ready to use, you can execute some code, and make the assertions:
+
+1. Either with the spy directly by using `assert_sent`/ `assert_not_sent` methods from `MessageToL1SpyAssertionsTrait` trait:
+
+```rust hljs
+
+use starknet::EthAddress;
+use snforge_std::{
+    declare, ContractClassTrait, DeclareResultTrait, spy_messages_to_l1,
+    MessageToL1SpyAssertionsTrait, MessageToL1,
+};
+
+use testing_messages_to_l1::{IMessageSenderDispatcher, IMessageSenderDispatcherTrait};
+
+#[test]
+fn test_spying_l1_messages() {
+    let mut spy = spy_messages_to_l1();
+
+    let contract = declare("MessageSender").unwrap().contract_class();
+    let (contract_address, _) = contract.deploy(@array![]).unwrap();
+
+    let dispatcher = IMessageSenderDispatcher { contract_address };
+
+    let receiver_address: felt252 = 0x2137;
+    dispatcher.greet_ethereum(receiver_address);
+
+    let expected_payload = array!['hello'];
+    let receiver_l1_address: EthAddress = receiver_address.try_into().unwrap();
+
+    spy
+        .assert_sent(
+            @array![\
+                (\
+                    contract_address, // Message sender\
+                    MessageToL1 { // Message content (receiver and payload)\
+                        to_address: receiver_l1_address, payload: expected_payload\
+                    }\
+                )\
+            ]
+        );
+}
+```
+
+2. Or use the messages' contents directly via `get_messages()` method of the `MessageToL1SpyTrait`:
+
+```rust hljs
+
+use starknet::EthAddress;
+use snforge_std::{
+    declare, ContractClassTrait, DeclareResultTrait, spy_messages_to_l1, MessageToL1SpyTrait,
+    MessageToL1SpyAssertionsTrait, MessageToL1, MessageToL1FilterTrait,
+};
+
+use testing_messages_to_l1::{IMessageSenderDispatcher, IMessageSenderDispatcherTrait};
+
+#[test]
+fn test_spying_l1_messages_details() {
+    let mut spy = spy_messages_to_l1();
+
+    let contract = declare("MessageSender").unwrap().contract_class();
+    let (contract_address, _) = contract.deploy(@array![]).unwrap();
+
+    let dispatcher = IMessageSenderDispatcher { contract_address };
+
+    let receiver_address: felt252 = 0x2137;
+    let receiver_l1_address: EthAddress = receiver_address.try_into().unwrap();
+
+    dispatcher.greet_ethereum(receiver_address);
+
+    let messages = spy.get_messages();
+
+    // Use filtering optionally on MessagesToL1 instance
+    let messages_from_specific_address = messages.sent_by(contract_address);
+    let messages_to_specific_address = messages_from_specific_address.sent_to(receiver_l1_address);
+
+    // Get the messages from the MessagesToL1 structure
+    let (from, message) = messages_to_specific_address.messages.at(0);
+
+    // Assert the sender
+    assert!(*from == contract_address, "Sent from wrong address");
+
+    // Assert the MessageToL1 fields
+    assert!(*message.to_address == receiver_l1_address, "Wrong L1 address of the receiver");
+    assert!(message.payload.len() == 1, "There should be 3 items in the data");
+    assert!(*message.payload.at(0) == 'hello', "Expected \"hello\" in payload");
+}
+```- Light
+- Rust
+- Coal
+- Navy
+- Ayu
+
+# The Starknet Foundry Book
+
+[Print this book](https://foundry-rs.github.io/starknet-foundry/print.html "Print this book")[Git repository](https://github.com/foundry-rs/starknet-foundry/ "Git repository")[Suggest an edit](https://github.com/foundry-rs/starknet-foundry/edit/master/docs/src/appendix/sncast/account/deploy.md "Suggest an edit")
+
+Deploy previously created account to Starknet.
+
+Required.
+
+Name of the (previously created) account to be deployed.
+
+Optional.
+
+Starknet RPC node url address.
+
+Overrides url from `snfoundry.toml`.
+
+Optional.
+
+Maximum fee for the `deploy_account` transaction in Fri or Wei depending on fee token or transaction version. When not used, defaults to auto-estimation. Must be greater than zero.
+
+Optional. When not used, defaults to STRK.
+
+Token used for fee payment. Possible values: ETH, STRK.
+
+Optional.
+
+Maximum gas for the `deploy_account` transaction. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional.
+
+Maximum gas unit price for the `deploy_account` transaction paid in Fri. When not used, defaults to auto-estimation. Must be greater than zero. (Only for STRK fee payment)
+
+Optional. When not used, defaults to v3.
+
+Version of the account deployment transaction. Possible values: v1, v3.
